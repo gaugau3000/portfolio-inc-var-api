@@ -8,8 +8,7 @@ WORKDIR /home/node
 COPY package*.json ./
 
 COPY --chown=node:node . .
-RUN yarn run build \
-    && yarn install --production --ignore-scripts --prefer-offline
+RUN yarn install && yarn run build && yarn install --production --ignore-scripts --prefer-offline
 
 FROM node:16-alpine3.14
 
