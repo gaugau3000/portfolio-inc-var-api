@@ -16,9 +16,9 @@ async function bootstrap() {
     .setVersion('0.1')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  fs.writeFileSync('./swagger-spec.json', JSON.stringify(document));
+  fs.writeFileSync('./docs/swagger-spec.json', JSON.stringify(document));
   SwaggerModule.setup('api', app, document);
 
-  if (process.env.NODE_ENV !== 'test') await app.listen(3000);
+  if (process.env.NODE_ENV !== 'gen_docs') await app.listen(3000);
 }
 bootstrap();

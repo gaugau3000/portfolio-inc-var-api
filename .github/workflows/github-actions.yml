@@ -24,8 +24,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: yarn run install
-    - run: yarn run test
-    - run: yarn run test:e2e
-    - name: Generate swagger doc
-      run: yarn run start
+    - run: npm install
+    - run: npm run test
+    - run: npm run test:e2e
