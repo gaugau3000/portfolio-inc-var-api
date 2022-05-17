@@ -1,5 +1,5 @@
 
-**Rest Api risk management trading tool based on incremental value at risk**
+# Rest Api risk management trading tool based on incremental value at risk
 
 ## Description
 
@@ -7,10 +7,19 @@ Following the  inspiration of the darwinex youtube playlist [Institutional-Grade
 
 The project is built in Typescript using nestjs framework.
 
+## DataProvider
+
+To calculate the value at risk you need to get the last n candles of the asset. Below supported dataProvider.
+
+| Data Source  | Status          | 
+| --------------- |--------------- |
+| Binance Future  | :white_check_mark: |
+
+
 ## Running the app with docker
 
 ```
-docker run --name incremental-var -p 3000:3000 gaugau3000/incremental_var
+docker run -p 3000:3000 gaugau3000/portfolio-inc-var-api
 ```
 
 ## Running the app with node js
@@ -42,6 +51,7 @@ $ npm run test:cov
 ## Documentation
 
 Please find swagger doc [here](https://gaugau3000.github.io/portfolio-inc-var-api/)
+You can make tests on this api going to http://localhost:3000/api
 
 ## License
 
