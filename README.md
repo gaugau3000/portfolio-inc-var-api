@@ -55,4 +55,4 @@ You can make tests on this api going to http://localhost:3000/api
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This tool is [MIT licensed](LICENSE).
