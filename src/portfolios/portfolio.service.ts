@@ -19,7 +19,7 @@ export class PortfolioService {
       (portfolio) => portfolio.uuid == portfolioId,
     );
 
-    if (portfolio == undefined) throw new NotFoundException();
+    if (portfolio === undefined) throw new NotFoundException();
 
     return portfolio.removePosition(positionId);
   }
@@ -29,7 +29,7 @@ export class PortfolioService {
     addPortfolioPosition: AddPortfolioPositionDto,
   ): Promise<import('./interfaces/interfaces').addPositionResponse> {
     const portfolio = this.portfolios.find(
-      (portfolio) => portfolio.uuid == uuid,
+      (portfolio) => portfolio.uuid === uuid,
     );
 
     return await portfolio.addPosition(addPortfolioPosition);
