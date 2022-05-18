@@ -1,10 +1,11 @@
 // eslint-disable-next-line prettier/prettier
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ccxt = require('ccxt');
-import { dataSource } from '../interfaces/interfaces';
 
+import { dataSource } from '../interfaces/interfaces';
+import config from '../../config/configuration';
 const binanceFuture = new ccxt.binance({
-  enableRateLimit: false,
+  ...config().ccxt_extra,
   options: {
     defaultType: 'future',
   },
