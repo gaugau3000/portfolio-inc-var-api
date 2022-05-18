@@ -7,7 +7,9 @@
     "remoteUser": "node",
 	"runArgs": [
 		"-v", "/home/gautier/.gitconfig:/home/node/.gitconfig:ro",
-		"-v", "portfolio-inc-var-api-bashhistory:/home/node/commandhistory"
+		"-v", "portfolio-inc-var-api-bashhistory:/home/node/commandhistory",
+		"--network=trading_bots",
+		"--name", "portfolio_inc_var_api"
 	],
 	"settings": { 
         "editor.codeActionsOnSave": {
