@@ -52,17 +52,16 @@ export async function isAcceptedOpportunity(
   )
     return false;
 
-  const openPositions: Array<position | positionOpportunity> = positions;
-  openPositions.push({
+  const proposedPosition = {
     pair: positionOpportunity.pair,
     dollarAmount: positionOpportunity.dollarAmount,
     direction: positionOpportunity.direction,
     dataSource: positionOpportunity.dataSource,
-  });
+  };
 
   const proposedValueAtRisk = await computeVar(
     params.zscore,
-    openPositions,
+    [...positions, proposedPosition],
     params.nbComputePeriods,
     params.timeframe,
   );
