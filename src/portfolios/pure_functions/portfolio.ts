@@ -59,6 +59,7 @@ export async function isAcceptedOpportunity(
     direction: positionOpportunity.direction,
     dataSource: positionOpportunity.dataSource,
   });
+
   const proposedValueAtRisk = await computeVar(
     params.zscore,
     openPositions,

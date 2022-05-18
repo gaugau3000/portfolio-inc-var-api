@@ -17,6 +17,7 @@ export async function computeVar(
   timeframe: string,
 ): Promise<number> {
   const positionsLastCloses: number[][] = [];
+
   await Promise.all(
     positions.map(async (position) => {
       positionsLastCloses.push(
@@ -31,10 +32,11 @@ export async function computeVar(
   );
 
   const positionsStd = [];
-  positionsLastCloses.forEach((positionLastCloses) =>
-    positionsStd.push(math.std(pctChange(positionLastCloses))),
-  );
-  return (
+  positionsLastCloses.forEach((positionLastCloses) => {
+    positionsStd.push(math.std(pctChange(positionLastCloses)));
+  });
+
+  const valueAtRisk =
     zscore *
     getPortfolioStd(
       computeWeights(positions),
@@ -44,8 +46,9 @@ export async function computeVar(
         positions.map((position) => position.direction),
       ),
     ) *
-    sumInvestedAmount(positions)
-  );
+    sumInvestedAmount(positions);
+
+  return valueAtRisk;
 }
 
 function pctChange(lastCloses: number[]) {
@@ -145,6 +148,7 @@ function computeWeightsStdMember(
     weightsStdMember =
       weightsStdMember + positionsWeights[i] ** 2 * positionsStd[i] ** 2;
   }
+
   return weightsStdMember;
 }
 

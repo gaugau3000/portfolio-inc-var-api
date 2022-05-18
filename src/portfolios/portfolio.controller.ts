@@ -19,11 +19,14 @@ export class PortfolioController {
   }
 
   @Post(':id/positions')
-  addPortfolioPosition(
+  async addPortfolioPosition(
     @Param('id') id: string,
     @Body() addPortfolioPosition: AddPortfolioPositionDto,
-  ): addPositionResponse {
-    return this.portfolioService.addPortfolioPosition(id, addPortfolioPosition);
+  ): Promise<addPositionResponse> {
+    return await this.portfolioService.addPortfolioPosition(
+      id,
+      addPortfolioPosition,
+    );
   }
 
   @Delete(':portfolioId/positions/:positionId')

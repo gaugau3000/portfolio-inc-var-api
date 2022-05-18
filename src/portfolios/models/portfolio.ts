@@ -32,7 +32,9 @@ export class Portfolio {
     this.uuid = uuid();
   }
 
-  addPosition(positionOpportunity: positionOpportunity): addPositionResponse {
+  async addPosition(
+    positionOpportunity: positionOpportunity,
+  ): Promise<addPositionResponse> {
     const rejectedStatus: addPositionResponse = {
       status: 'rejected',
     };
@@ -46,15 +48,19 @@ export class Portfolio {
       return rejectedStatus;
 
     if (
-      !isAcceptedOpportunity(positionOpportunity, this.currentPositions, {
-        maxAllowedValueAtRisk: this.maxVarInDollar,
-        maxOpenTradeSameSymbolSameDirection:
-          this.maxOpenTradeSameSymbolSameDirection,
-        zscore: this.zscore,
-        nbComputePeriods: this.nbComputePeriods,
-        timeframe: this.timeframe,
-        dataSource: positionOpportunity.dataSource,
-      })
+      !(await isAcceptedOpportunity(
+        positionOpportunity,
+        this.currentPositions,
+        {
+          maxAllowedValueAtRisk: this.maxVarInDollar,
+          maxOpenTradeSameSymbolSameDirection:
+            this.maxOpenTradeSameSymbolSameDirection,
+          zscore: this.zscore,
+          nbComputePeriods: this.nbComputePeriods,
+          timeframe: this.timeframe,
+          dataSource: positionOpportunity.dataSource,
+        },
+      ))
     )
       return rejectedStatus;
 

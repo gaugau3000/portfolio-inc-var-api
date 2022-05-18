@@ -24,15 +24,15 @@ export class PortfolioService {
     return portfolio.removePosition(positionId);
   }
 
-  addPortfolioPosition(
+  async addPortfolioPosition(
     uuid: string,
     addPortfolioPosition: AddPortfolioPositionDto,
-  ): import('./interfaces/interfaces').addPositionResponse {
+  ): Promise<import('./interfaces/interfaces').addPositionResponse> {
     const portfolio = this.portfolios.find(
       (portfolio) => portfolio.uuid == uuid,
     );
 
-    return portfolio.addPosition(addPortfolioPosition);
+    return await portfolio.addPosition(addPortfolioPosition);
   }
 
   create(createPortfolioDto: CreatePortfolioDto): { uuid: string } {
