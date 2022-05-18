@@ -35,7 +35,7 @@ describe('PortfolioController', () => {
     });
 
     describe('Add an allowed position', () => {
-      it('should return a validated response with uuid', () => {
+      it('should return a validated response with uuid', async () => {
         const addPortfolioPosition: AddPortfolioPositionDto = {
           pair: 'BTC/USDT',
           dollarAmount: 100,
@@ -46,9 +46,9 @@ describe('PortfolioController', () => {
           portfolioUuid,
           addPortfolioPosition,
         );
-        positionUuid = positionResponse.uuid;
+        positionUuid = (await positionResponse).uuid;
         expect(isUuid(positionUuid)).toBeTruthy();
-        expect(positionResponse.status).toBe('accepted');
+        expect((await positionResponse).status).toBe('accepted');
       });
     });
 
