@@ -3,13 +3,18 @@ import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
 import { PortfolioService } from './portfolio.service';
 import { addPositionResponse } from './interfaces/interfaces';
+import { ApiCreatedResponse } from '@nestjs/swagger';
+import { createPortfolioResponse } from './responses/create-portfolio-response';
+import { addPortfolioPositionResponse } from './responses/add-portfolio-position-response';
 
 @Controller('portfolios')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
   @Post()
-  create(@Body() createPortfolioDto: CreatePortfolioDto): { uuid: string } {
+  create(
+    @Body() createPortfolioDto: CreatePortfolioDto,
+  ): createPortfolioResponse {
     return this.portfolioService.create(createPortfolioDto);
   }
 
@@ -22,7 +27,7 @@ export class PortfolioController {
   async addPortfolioPosition(
     @Param('id') id: string,
     @Body() addPortfolioPosition: AddPortfolioPositionDto,
-  ): Promise<addPositionResponse> {
+  ): Promise<addPortfolioPositionResponse> {
     return await this.portfolioService.addPortfolioPosition(
       id,
       addPortfolioPosition,
