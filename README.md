@@ -3,7 +3,7 @@
 
 ## Description
 
-Following the  inspiration of the darwinex youtube playlist [Institutional-Grade Risk Management Techniques for Traders](https://www.youtube.com/watch?v=BxkkhzfD4Ug&list=PLv-cA-4O3y979Ltr9wQ2lRJu1INve3RCM&ab_channel=Darwinex) this api will allow you to manage the risk of your trading systems based on incremental value at risk (take into account the volatility and the correlation between assets)
+Following the  inspiration of the darwinex youtube playlist [Institutional-Grade Risk Management Techniques for Traders](https://www.youtube.com/watch?v=BxkkhzfD4Ug&list=PLv-cA-4O3y979Ltr9wQ2lRJu1INve3RCM&ab_channel=Darwinex) this api will allow you to manage the risk of your trading systems based on incremental value at risk based on variance-covariance method (take into account the volatility and the correlation between assets)
 
 The project is built in Typescript using nestjs framework.
 
