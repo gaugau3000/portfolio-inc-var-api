@@ -22,6 +22,7 @@
 		"yzhang.markdown-all-in-one",
 		"marquesmps.dockerfile-validator",
 		"streetsidesoftware.code-spell-checker",
-		"vscode-icons-team.vscode-icons"
+		"vscode-icons-team.vscode-icons",
+		"firsttris.vscode-jest-runner"
 	]
 }
