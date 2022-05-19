@@ -3,19 +3,33 @@
 const ccxt = require('ccxt');
 
 import { dataSource } from '../interfaces/interfaces';
-import config from '../../config/configuration';
-const binanceFuture = new ccxt.binance({
-  ...config().ccxt_extra,
-  options: {
-    defaultType: 'future',
-  },
-});
+import { AppConfig } from '../models/app-config';
+
 export async function getAssetLastCloses(
   pair: string,
   nbComputePeriods: number,
   timeframe: string,
   dataSource: dataSource,
 ) {
+  const ccxtExtra = {
+    enableRateLimit: false,
+    urls: {
+      api: {
+        ...(AppConfig.get('ccxtExtraConfig.binanceFutureUrlOverwrite') && {
+          fapiPublic: AppConfig.get(
+            'ccxtExtraConfig.binanceFutureUrlOverwrite',
+          ),
+        }),
+      },
+    },
+  };
+
+  const binanceFuture = new ccxt.binance({
+    ...ccxtExtra,
+    options: {
+      defaultType: 'future',
+    },
+  });
   let ohlc;
   if (dataSource === 'binance_future')
     ohlc = await binanceFuture.fetchOHLCV(pair, timeframe);

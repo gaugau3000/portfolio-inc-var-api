@@ -4,14 +4,22 @@ import { PortfolioController } from './portfolio.controller';
 import { PortfolioService } from './portfolio.service';
 import { isUuid } from 'uuidv4';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
+import { AppConfig } from './models/app-config';
+import { ConfigModule } from '@nestjs/config';
+import configuration from '../config/configuration';
 
 describe('PortfolioController', () => {
   let portfolioController: PortfolioController;
 
   beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          load: [configuration],
+        }),
+      ],
       controllers: [PortfolioController],
-      providers: [PortfolioService],
+      providers: [PortfolioService, AppConfig],
     }).compile();
 
     portfolioController = app.get<PortfolioController>(PortfolioController);

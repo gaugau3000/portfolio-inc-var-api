@@ -2,8 +2,6 @@ import { Controller, Post, Body, Param, Delete } from '@nestjs/common';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
 import { PortfolioService } from './portfolio.service';
-import { addPositionResponse } from './interfaces/interfaces';
-import { ApiCreatedResponse } from '@nestjs/swagger';
 import { createPortfolioResponse } from './responses/create-portfolio-response';
 import { addPortfolioPositionResponse } from './responses/add-portfolio-position-response';
 

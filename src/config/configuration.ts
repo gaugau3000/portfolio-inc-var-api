@@ -1,5 +1,6 @@
 export default () => ({
-  ccxt_extra: {
-    enableRateLimit: false,
+  ccxtExtraConfig: {
+    binanceFutureUrlOverwrite:
+      process.env.BINANCE_FUTURE_URL_OVERWRITE || undefined,
   },
 });
