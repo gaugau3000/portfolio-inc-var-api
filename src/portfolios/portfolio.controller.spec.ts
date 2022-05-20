@@ -11,7 +11,7 @@ import configuration from '../config/configuration';
 describe('PortfolioController', () => {
   let portfolioController: PortfolioController;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
@@ -26,46 +26,66 @@ describe('PortfolioController', () => {
   });
 
   describe('Portfolio Controller', () => {
-    let portfolioUuid = '';
-    let positionUuid = '';
-    describe('Create a portfolio', () => {
-      it('should return an uuid string', () => {
-        const portfolioAttributes: CreatePortfolioDto = {
-          maxVarInDollar: 200,
-          maxOpenTradeSameSymbolSameDirection: 1,
-          nbComputePeriods: 20,
-          zscore: 1.65,
-          timeframe: '15m',
-        };
-        portfolioUuid = portfolioController.create(portfolioAttributes).uuid;
+    const portfolioAttributes: CreatePortfolioDto = {
+      maxVarInDollar: 200,
+      maxOpenTradeSameSymbolSameDirection: 1,
+      nbComputePeriods: 20,
+      zscore: 1.65,
+      timeframe: '15m',
+      nameId: 'crypto_15m',
+    };
+
+    const firstPortfolioPosition: AddPortfolioPositionDto = {
+      pair: 'BTC/USDT',
+      dollarAmount: 100,
+      direction: 'long',
+      dataSource: 'binance_future',
+    };
+    describe('When I create a portfolio', () => {
+      it('then it should return an uuid string', () => {
+        const portfolioUuid =
+          portfolioController.create(portfolioAttributes).uuid;
         expect(isUuid(portfolioUuid)).toBeTruthy();
       });
     });
 
-    describe('Add an allowed position', () => {
-      it('should return a validated response with uuid', async () => {
-        const addPortfolioPosition: AddPortfolioPositionDto = {
-          pair: 'BTC/USDT',
-          dollarAmount: 100,
-          direction: 'long',
-          dataSource: 'binance_future',
-        };
-        const positionResponse = portfolioController.addPortfolioPosition(
-          portfolioUuid,
-          addPortfolioPosition,
-        );
-        positionUuid = (await positionResponse).uuid;
-        expect(isUuid(positionUuid)).toBeTruthy();
-        expect((await positionResponse).status).toBe('accepted');
+    describe('When I create a portfolio and i get all portfolios', () => {
+      it('then it should return an array of portfolio with lenth 1 and uuid of the portfolio should be the same with the one get', () => {
+        const portfolioUuid =
+          portfolioController.create(portfolioAttributes).uuid;
+        const portfolios = portfolioController.findAll();
+        expect(portfolios.length).toBe(1);
+        expect(portfolios[0].uuid).toBe(portfolioUuid);
       });
-    });
 
-    describe('Remove position', () => {
-      it('should return a validated response', () => {
-        portfolioController.removePortfolioPosition(
-          portfolioUuid,
-          positionUuid,
-        );
+      describe('Given a portfolio then i had an allowed position', () => {
+        it('then it should return an accepted response with uuid', async () => {
+          const portfolioUuid =
+            portfolioController.create(portfolioAttributes).uuid;
+          const positionResponse = portfolioController.addPortfolioPosition(
+            portfolioUuid,
+            firstPortfolioPosition,
+          );
+          const positionUuid = (await positionResponse).uuid;
+          expect(isUuid(positionUuid)).toBeTruthy();
+          expect((await positionResponse).status).toBe('accepted');
+        });
+      });
+
+      describe('Given I create a portfolio and i add an allowed position when i remove the position', () => {
+        it('then it should return a validated response', async () => {
+          const portfolioUuid =
+            portfolioController.create(portfolioAttributes).uuid;
+          const positionResponse = portfolioController.addPortfolioPosition(
+            portfolioUuid,
+            firstPortfolioPosition,
+          );
+          const positionUuid = (await positionResponse).uuid;
+          portfolioController.removePortfolioPosition(
+            portfolioUuid,
+            positionUuid,
+          );
+        });
       });
     });
   });
