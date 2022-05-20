@@ -1,5 +1,5 @@
 import { timeframe } from '../interfaces/interfaces';
-import { IsInt, IsNumber, IsString, Min } from 'class-validator';
+import { IsDefined, IsInt, IsNumber, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePortfolioDto {
@@ -8,6 +8,7 @@ export class CreatePortfolioDto {
       'The max value at risk in dollar you would like to set for your portfolio',
     example: 1000,
   })
+  @IsDefined()
   @IsNumber()
   @Min(0)
   maxVarInDollar: number;
@@ -17,6 +18,7 @@ export class CreatePortfolioDto {
       'The maximum of open positions for a pair in the same direction (if 1 then you can open only one BTC/USDT long, the second opportunity with BTC/USDT long will be rejected)',
     example: 1,
   })
+  @IsDefined()
   @IsNumber()
   @Min(1)
   @IsInt()
@@ -27,6 +29,7 @@ export class CreatePortfolioDto {
       'The number of periods to compute the correlation and standard deviation of the portfolio var',
     example: 20,
   })
+  @IsDefined()
   @IsNumber()
   @Min(1)
   @IsInt()
@@ -37,10 +40,12 @@ export class CreatePortfolioDto {
       'The zscore used for compute the portfolio var 1.645 for 90% confidence,1.96 for 95%,2.58 for 99%',
     example: 1.645,
   })
+  @IsDefined()
   @IsNumber()
   @Min(0)
   zscore: number;
 
+  @IsDefined()
   @IsString()
   @ApiProperty({
     description:
@@ -48,4 +53,12 @@ export class CreatePortfolioDto {
     example: '15m',
   })
   timeframe: timeframe;
+
+  @IsDefined()
+  @IsString()
+  @ApiProperty({
+    description: 'Give the portfolio a unique explicit name',
+    example: 'crypto_15m',
+  })
+  nameId: string;
 }
