@@ -1,12 +1,27 @@
-import { Controller, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Get,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
 import { PortfolioService } from './portfolio.service';
 import { createPortfolioResponse } from './responses/create-portfolio-response';
 import { addPortfolioPositionResponse } from './responses/add-portfolio-position-response';
+import { Portfolio } from './models/portfolio';
 
 @Controller('portfolios')
 export class PortfolioController {
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get()
+  findAll(): Array<Portfolio> {
+    return this.portfolioService.findAll();
+  }
   constructor(private readonly portfolioService: PortfolioService) {}
 
   @Post()

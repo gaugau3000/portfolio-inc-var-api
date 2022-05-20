@@ -18,6 +18,7 @@ export class Portfolio {
   zscore: number;
   timeframe: timeframe;
   uuid: string;
+  nameId: string;
 
   currentPositions: Array<position>;
 
@@ -30,6 +31,7 @@ export class Portfolio {
     this.timeframe = obj.timeframe;
     this.currentPositions = [];
     this.uuid = uuid();
+    this.nameId = obj.nameId;
   }
 
   async addPosition(
