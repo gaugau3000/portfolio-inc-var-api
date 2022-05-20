@@ -45,6 +45,7 @@ describe('Portfolio Controller (e2e)', () => {
         nbComputePeriods: 20,
         zscore: 1.65,
         timeframe: '1m',
+        nameId: 'crypto_15m',
       };
       return request(app.getHttpServer())
         .post('/portfolios')
