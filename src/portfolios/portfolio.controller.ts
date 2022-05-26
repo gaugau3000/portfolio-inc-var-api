@@ -8,6 +8,7 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
@@ -15,6 +16,7 @@ import { PortfolioService } from './portfolio.service';
 import { createPortfolioResponse } from './responses/create-portfolio-response';
 import { addPortfolioPositionResponse } from './responses/add-portfolio-position-response';
 import { Portfolio } from './models/portfolio';
+import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 
 @Controller('portfolios')
 export class PortfolioController {
@@ -36,6 +38,14 @@ export class PortfolioController {
     @Body() createPortfolioDto: CreatePortfolioDto,
   ): createPortfolioResponse {
     return this.portfolioService.create(createPortfolioDto);
+  }
+
+  @Patch(':uuid')
+  update(
+    @Param('uuid') uuid: string,
+    @Body() updatePortfolioDto: UpdatePortfolioDto,
+  ) {
+    return this.portfolioService.update(uuid, updatePortfolioDto);
   }
 
   @Delete(':uuid')

@@ -7,6 +7,7 @@ import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
 import { AppConfig } from './models/app-config';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '../config/configuration';
+import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 
 describe('PortfolioController', () => {
   let portfolioController: PortfolioController;
@@ -98,6 +99,19 @@ describe('PortfolioController', () => {
           ).uuid;
 
           expect(portfolioUuid).toBe(findedPortfolioUuid);
+        });
+      });
+
+      describe('Given I create a portfolio of max mar is 200 and I change the var to 100 and i list all portfolios', () => {
+        it('then the portfolio should have var of 100 dollar', async () => {
+          const portfolioUuid =
+            portfolioController.create(portfolioAttributes).uuid;
+          const portfolioUpdateDto: UpdatePortfolioDto = {
+            maxVarInDollar: 100,
+          };
+          portfolioController.update(portfolioUuid, portfolioUpdateDto);
+
+          expect(portfolioController.findAll()[0].maxVarInDollar).toBe(100);
         });
       });
     });

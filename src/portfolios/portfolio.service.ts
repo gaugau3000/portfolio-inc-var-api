@@ -7,9 +7,26 @@ import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 
 import { Portfolio } from './models/portfolio';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
+import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 
 @Injectable()
 export class PortfolioService {
+  update(portfolioUuid: string, updateUserDto: UpdatePortfolioDto) {
+    const portfolio = this.portfolios.find(
+      (portfolio) => portfolio.uuid == portfolioUuid,
+    );
+
+    if (portfolio === undefined)
+      throw new NotFoundException(
+        `The portfolio with id ${portfolioUuid} has not been found`,
+      );
+
+    updateUserDto.maxVarInDollar &&
+      (portfolio.maxVarInDollar = updateUserDto.maxVarInDollar);
+    updateUserDto.maxOpenTradeSameSymbolSameDirection &&
+      (portfolio.maxOpenTradeSameSymbolSameDirection =
+        updateUserDto.maxOpenTradeSameSymbolSameDirection);
+  }
   private portfolios: Portfolio[] = [];
 
   findAll(): Portfolio[] {
