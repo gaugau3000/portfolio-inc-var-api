@@ -1,11 +1,8 @@
 import {
-  dataSource,
   position,
   positionOpportunity,
   positions,
-  timeframe,
 } from '../interfaces/interfaces';
-import { computeVar } from './value-at-risk';
 import { uuid as uuidv4 } from 'uuidv4';
 
 export function isBelowMaxOpenTradeSameSymbolSameDirection(
@@ -34,13 +31,10 @@ export function isBelowMaxOpenTradeSameSymbolSameDirection(
 export async function isAcceptedOpportunity(
   positionOpportunity: positionOpportunity,
   positions: Array<position>,
+  proposedValueAtRisk: number,
   params: {
     maxAllowedValueAtRisk: number;
     maxOpenTradeSameSymbolSameDirection: number;
-    zscore: number;
-    nbComputePeriods: number;
-    timeframe: timeframe;
-    dataSource: dataSource;
   },
 ): Promise<boolean> {
   if (
@@ -51,20 +45,6 @@ export async function isAcceptedOpportunity(
     )
   )
     return false;
-
-  const proposedPosition = {
-    pair: positionOpportunity.pair,
-    dollarAmount: positionOpportunity.dollarAmount,
-    direction: positionOpportunity.direction,
-    dataSource: positionOpportunity.dataSource,
-  };
-
-  const proposedValueAtRisk = await computeVar(
-    params.zscore,
-    [...positions, proposedPosition],
-    params.nbComputePeriods,
-    params.timeframe,
-  );
 
   if (proposedValueAtRisk > params.maxAllowedValueAtRisk) return false;
 

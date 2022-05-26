@@ -78,13 +78,9 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
     const positions: positions = [];
 
     expect(
-      await isAcceptedOpportunity(positionOpportunity, positions, {
+      await isAcceptedOpportunity(positionOpportunity, positions, 100, {
         maxAllowedValueAtRisk: 200,
         maxOpenTradeSameSymbolSameDirection: 1,
-        zscore: 1.65,
-        nbComputePeriods: 20,
-        timeframe: '15m',
-        dataSource: positionOpportunity.dataSource,
       }),
     ).toBe(true);
   });
@@ -102,13 +98,9 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
     const positions: positions = [];
 
     expect(
-      await isAcceptedOpportunity(positionOpportunity, positions, {
+      await isAcceptedOpportunity(positionOpportunity, positions, 100000000, {
         maxAllowedValueAtRisk: 200,
         maxOpenTradeSameSymbolSameDirection: 1,
-        zscore: 1.65,
-        nbComputePeriods: 20,
-        timeframe: '15m',
-        dataSource: 'binance_future',
       }),
     ).toBe(false);
   });

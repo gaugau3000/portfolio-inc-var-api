@@ -10,6 +10,7 @@ import {
   isAcceptedOpportunity,
 } from '../pure_functions/portfolio';
 import { timeframe } from '../interfaces/interfaces';
+import { computeVar } from '../pure_functions/value-at-risk';
 
 export class Portfolio {
   maxVarInDollar: number;
@@ -21,6 +22,7 @@ export class Portfolio {
   nameId: string;
 
   currentPositions: Array<position>;
+  currentValueAtRisk: number;
 
   constructor(obj: CreatePortfolioDto) {
     this.maxVarInDollar = obj.maxVarInDollar;
@@ -49,26 +51,32 @@ export class Portfolio {
     )
       return rejectedStatus;
 
+    const proposedVar = await computeVar(
+      this.zscore,
+      [...this.currentPositions, positionOpportunity],
+      this.nbComputePeriods,
+      this.timeframe,
+    );
+
     if (
-      !(await isAcceptedOpportunity(
+      !isAcceptedOpportunity(
         positionOpportunity,
         this.currentPositions,
+        proposedVar,
         {
           maxAllowedValueAtRisk: this.maxVarInDollar,
           maxOpenTradeSameSymbolSameDirection:
             this.maxOpenTradeSameSymbolSameDirection,
-          zscore: this.zscore,
-          nbComputePeriods: this.nbComputePeriods,
-          timeframe: this.timeframe,
-          dataSource: positionOpportunity.dataSource,
         },
-      ))
+      )
     )
       return rejectedStatus;
 
     const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
 
     this.currentPositions.push(acceptedPosition);
+
+    this.currentValueAtRisk = proposedVar;
 
     return {
       status: 'accepted',
