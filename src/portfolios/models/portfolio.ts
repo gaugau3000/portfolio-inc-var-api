@@ -58,19 +58,18 @@ export class Portfolio {
       this.timeframe,
     );
 
-    if (
-      !isAcceptedOpportunity(
-        positionOpportunity,
-        this.currentPositions,
-        proposedVar,
-        {
-          maxAllowedValueAtRisk: this.maxVarInDollar,
-          maxOpenTradeSameSymbolSameDirection:
-            this.maxOpenTradeSameSymbolSameDirection,
-        },
-      )
-    )
-      return rejectedStatus;
+    const isAcceptedOpportunityStatus = await isAcceptedOpportunity(
+      positionOpportunity,
+      this.currentPositions,
+      proposedVar,
+      {
+        maxAllowedValueAtRisk: this.maxVarInDollar,
+        maxOpenTradeSameSymbolSameDirection:
+          this.maxOpenTradeSameSymbolSameDirection,
+      },
+    );
+
+    if (!isAcceptedOpportunityStatus) return rejectedStatus;
 
     const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
 
