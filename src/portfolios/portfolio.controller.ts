@@ -7,6 +7,7 @@ import {
   Get,
   ClassSerializerInterceptor,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
@@ -17,12 +18,18 @@ import { Portfolio } from './models/portfolio';
 
 @Controller('portfolios')
 export class PortfolioController {
+  constructor(private readonly portfolioService: PortfolioService) {}
+
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll(): Array<Portfolio> {
     return this.portfolioService.findAll();
   }
-  constructor(private readonly portfolioService: PortfolioService) {}
+
+  @Get('findByName')
+  findByNameId(@Query('portfolio_name_id') portfolioNameId: string): Portfolio {
+    return this.portfolioService.findByNameId(portfolioNameId);
+  }
 
   @Post()
   create(

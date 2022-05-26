@@ -16,6 +16,19 @@ export class PortfolioService {
     return this.portfolios;
   }
 
+  findByNameId(portfolioNameId: string): Portfolio {
+    const findedPortfolio = this.portfolios.find(
+      (portfolio) => portfolio.nameId === portfolioNameId,
+    );
+
+    if (findedPortfolio === undefined)
+      throw new NotFoundException(
+        `The portfolio with nameId ${portfolioNameId} has not been found`,
+      );
+
+    return findedPortfolio;
+  }
+
   delete(uuid: string) {
     this.portfolios = this.portfolios.filter(
       (portfolio) => portfolio.uuid !== uuid,

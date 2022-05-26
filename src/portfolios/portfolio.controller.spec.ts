@@ -87,6 +87,19 @@ describe('PortfolioController', () => {
           );
         });
       });
+
+      describe('Given I create a portfolio and i get it by nameId', () => {
+        it('then it should return the portfolio this the same uuid', async () => {
+          const portfolioUuid =
+            portfolioController.create(portfolioAttributes).uuid;
+
+          const findedPortfolioUuid = portfolioController.findByNameId(
+            portfolioAttributes.nameId,
+          ).uuid;
+
+          expect(portfolioUuid).toBe(findedPortfolioUuid);
+        });
+      });
     });
   });
 });
