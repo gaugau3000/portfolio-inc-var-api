@@ -83,9 +83,16 @@ export class Portfolio {
     };
   }
 
-  removePosition(uuid: string): void {
+  async removePosition(uuid: string): Promise<void> {
     this.currentPositions = this.currentPositions.filter(
       (position) => position.uuid !== uuid,
+    );
+
+    this.currentValueAtRisk = await computeVar(
+      this.zscore,
+      this.currentPositions,
+      this.nbComputePeriods,
+      this.timeframe,
     );
   }
 }

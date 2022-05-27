@@ -52,7 +52,7 @@ export class PortfolioService {
     );
   }
 
-  removePortfolioPosition(portfolioId: string, positionId: string) {
+  async removePortfolioPosition(portfolioId: string, positionId: string) {
     const portfolio = this.portfolios.find(
       (portfolio) => portfolio.uuid == portfolioId,
     );
@@ -62,7 +62,7 @@ export class PortfolioService {
         `The portfolio with id ${portfolioId} has not been found`,
       );
 
-    return portfolio.removePosition(positionId);
+    return await portfolio.removePosition(positionId);
   }
 
   async addPortfolioPosition(
