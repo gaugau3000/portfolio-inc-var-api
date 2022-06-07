@@ -36,17 +36,20 @@ export async function computeVar(
     positionsStd.push(math.std(pctChange(positionLastCloses)));
   });
 
-  const valueAtRisk =
-    zscore *
-    getPortfolioStd(
-      computeWeights(positions),
-      positionsStd,
-      getPositionsCorrMatrix(
-        positionsLastCloses,
-        positions.map((position) => position.direction),
-      ),
-    ) *
-    sumInvestedAmount(positions);
+  const weights: number[] = computeWeights(positions);
+
+  const portfolioStd: number = getPortfolioStd(
+    weights,
+    positionsStd,
+    getPositionsCorrMatrix(
+      positionsLastCloses,
+      positions.map((position) => position.direction),
+    ),
+  );
+
+  const totalInvestedAmount: number = sumInvestedAmount(positions);
+
+  const valueAtRisk = zscore * portfolioStd * totalInvestedAmount;
 
   return valueAtRisk;
 }

@@ -4,6 +4,7 @@ import {
   positions,
 } from '../interfaces/interfaces';
 import { uuid as uuidv4 } from 'uuidv4';
+import { opportunityInfo } from '../interfaces/interfaces';
 
 export function isBelowMaxOpenTradeSameSymbolSameDirection(
   positionOpportunity: positionOpportunity,
@@ -29,24 +30,24 @@ export function isBelowMaxOpenTradeSameSymbolSameDirection(
 }
 
 export async function isAcceptedOpportunity(
-  positionOpportunity: positionOpportunity,
-  positions: Array<position>,
-  proposedValueAtRisk: number,
-  params: {
-    maxAllowedValueAtRisk: number;
-    maxOpenTradeSameSymbolSameDirection: number;
-  },
+  opportunityInfo: opportunityInfo,
 ): Promise<boolean> {
   if (
     !isBelowMaxOpenTradeSameSymbolSameDirection(
-      positionOpportunity,
-      positions,
-      params.maxOpenTradeSameSymbolSameDirection,
+      opportunityInfo.opportunity.positionOpportunity,
+      opportunityInfo.state.currentPositions,
+      opportunityInfo.constraints.maxOpenTradeSameSymbolSameDirection,
     )
   )
     return false;
 
-  if (proposedValueAtRisk > params.maxAllowedValueAtRisk) return false;
+  if (
+    opportunityInfo.opportunity.proposedVar >
+      opportunityInfo.constraints.maxVarInDollar &&
+    opportunityInfo.opportunity.proposedVar >
+      opportunityInfo.state.currentValueAtRisk
+  )
+    return false;
 
   return true;
 }

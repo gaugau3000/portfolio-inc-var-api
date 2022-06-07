@@ -9,7 +9,7 @@ import {
   isBelowMaxOpenTradeSameSymbolSameDirection,
   isAcceptedOpportunity,
 } from '../pure_functions/portfolio';
-import { timeframe } from '../interfaces/interfaces';
+import { timeframe, opportunityInfo } from '../interfaces/interfaces';
 import { computeVar } from '../pure_functions/value-at-risk';
 
 export class Portfolio {
@@ -42,6 +42,7 @@ export class Portfolio {
     const rejectedStatus: addPositionResponse = {
       status: 'rejected',
     };
+
     if (
       !isBelowMaxOpenTradeSameSymbolSameDirection(
         positionOpportunity,
@@ -49,7 +50,10 @@ export class Portfolio {
         this.maxOpenTradeSameSymbolSameDirection,
       )
     )
-      return rejectedStatus;
+      return {
+        ...rejectedStatus,
+        reason: 'upper the max open trades is the same direction',
+      };
 
     const proposedVar = await computeVar(
       this.zscore,
@@ -58,18 +62,32 @@ export class Portfolio {
       this.timeframe,
     );
 
-    const isAcceptedOpportunityStatus = await isAcceptedOpportunity(
-      positionOpportunity,
-      this.currentPositions,
-      proposedVar,
-      {
-        maxAllowedValueAtRisk: this.maxVarInDollar,
+    const opportunityInfo: opportunityInfo = {
+      opportunity: {
+        positionOpportunity: positionOpportunity,
+        proposedVar: proposedVar,
+      },
+      state: {
+        currentPositions: this.currentPositions,
+        currentValueAtRisk: this.currentValueAtRisk,
+      },
+
+      constraints: {
+        maxVarInDollar: this.maxVarInDollar,
         maxOpenTradeSameSymbolSameDirection:
           this.maxOpenTradeSameSymbolSameDirection,
       },
+    };
+
+    const isAcceptedOpportunityStatus = await isAcceptedOpportunity(
+      opportunityInfo,
     );
 
-    if (!isAcceptedOpportunityStatus) return rejectedStatus;
+    if (!isAcceptedOpportunityStatus)
+      return {
+        ...rejectedStatus,
+        reason: 'upper the max var allowed',
+      };
 
     const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
 

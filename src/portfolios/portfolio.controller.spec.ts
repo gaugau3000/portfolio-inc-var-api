@@ -51,7 +51,7 @@ describe('PortfolioController', () => {
     });
 
     describe('When I create a portfolio and i get all portfolios', () => {
-      it('then it should return an array of portfolio with lenth 1 and uuid of the portfolio should be the same with the one get', () => {
+      it('then it should return an array of portfolio with length 1 and uuid of the portfolio should be the same with the one get', () => {
         const portfolioUuid =
           portfolioController.create(portfolioAttributes).uuid;
         const portfolios = portfolioController.findAll();
@@ -59,7 +59,7 @@ describe('PortfolioController', () => {
         expect(portfolios[0].uuid).toBe(portfolioUuid);
       });
 
-      describe('Given a portfolio then i had an allowed position', () => {
+      describe('Given a portfolio and i had an allowed position', () => {
         it('then it should return an accepted response with uuid', async () => {
           const portfolioUuid =
             portfolioController.create(portfolioAttributes).uuid;

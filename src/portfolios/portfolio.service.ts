@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +13,8 @@ import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 
 @Injectable()
 export class PortfolioService {
+  private portfolios: Portfolio[] = [];
+
   update(portfolioUuid: string, updateUserDto: UpdatePortfolioDto) {
     const portfolio = this.portfolios.find(
       (portfolio) => portfolio.uuid == portfolioUuid,
@@ -27,7 +31,6 @@ export class PortfolioService {
       (portfolio.maxOpenTradeSameSymbolSameDirection =
         updateUserDto.maxOpenTradeSameSymbolSameDirection);
   }
-  private portfolios: Portfolio[] = [];
 
   findAll(): Portfolio[] {
     return this.portfolios;
@@ -78,7 +81,19 @@ export class PortfolioService {
         `The portfolio with id ${uuid} has not been found`,
       );
 
-    return await portfolio.addPosition(addPortfolioPosition);
+    const addPositionInfos = await portfolio.addPosition(addPortfolioPosition);
+
+    if (addPositionInfos.status == 'rejected')
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: addPositionInfos.reason,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+
+    delete addPositionInfos.reason;
+    return addPositionInfos;
   }
 
   create(createPortfolioDto: CreatePortfolioDto): { uuid: string } {
@@ -91,6 +106,7 @@ export class PortfolioService {
       );
 
     const portfolio = new Portfolio(createPortfolioDto);
+
     this.portfolios.push(portfolio);
 
     return { uuid: portfolio.uuid };

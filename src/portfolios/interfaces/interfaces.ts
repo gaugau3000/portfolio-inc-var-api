@@ -31,6 +31,23 @@ export type timeframe =
 export interface addPositionResponse {
   status: 'accepted' | 'rejected';
   uuid?: string;
+  reason?: string;
 }
 
 export type dataSource = 'binance_future';
+
+export type opportunityInfo = {
+  opportunity: {
+    positionOpportunity: positionOpportunity;
+    proposedVar: number;
+  };
+  state: {
+    currentPositions: Array<position>;
+    currentValueAtRisk: number;
+  };
+
+  constraints: {
+    maxVarInDollar: number;
+    maxOpenTradeSameSymbolSameDirection: number;
+  };
+};
