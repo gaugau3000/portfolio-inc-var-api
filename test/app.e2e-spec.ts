@@ -164,7 +164,7 @@ describe('Portfolio Create a portfolio -> add allowed position -> change allowed
   describe('Create a portfolio with max var of 100000, max open trade of 1 on 1 min tf and an accepted position and add a rejected position upper accepted var ', () => {
     let portfolioUuid = '';
 
-    it('should give status code 403 (forbidden) with message error "upper the max var allowed" ', async () => {
+    it('should give status code 403 (forbidden) with message error "you cannot add this position because you will exceed max allowed var" ', async () => {
       const createPortfolioDto: CreatePortfolioDto = {
         maxVarInDollar: 100000,
         maxOpenTradeSameSymbolSameDirection: 1,
@@ -214,7 +214,9 @@ describe('Portfolio Create a portfolio -> add allowed position -> change allowed
         })
         .expect(403);
 
-      expect(error).toBe('upper the max var allowed');
+      expect(error).toBe(
+        'you cannot add this position because you will exceed max allowed var',
+      );
     });
   });
 });

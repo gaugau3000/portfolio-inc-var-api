@@ -87,7 +87,8 @@ export class Portfolio {
     if (!isAcceptedOpportunityStatus)
       return {
         ...rejectedStatus,
-        reason: 'upper the max var allowed',
+        reason:
+          'you cannot add this position because you will exceed max allowed var',
       };
 
     const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
