@@ -34,6 +34,7 @@ export class Portfolio {
     this.currentPositions = [];
     this.uuid = uuid();
     this.nameId = obj.nameId;
+    this.currentValueAtRisk = 0;
   }
 
   async addPosition(
