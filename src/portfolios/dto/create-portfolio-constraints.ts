@@ -10,8 +10,7 @@ export class CreatePortfolioConstraints {
   }
 
   @ApiProperty({
-    description:
-      'The max value at risk in dollar you would like to set for your portfolio',
+    description: 'The max value at risk in dollar for your portfolio',
     example: 1000,
   })
   @IsDefined()

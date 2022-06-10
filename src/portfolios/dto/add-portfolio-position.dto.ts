@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AddPortfolioPositionDto {
   @ApiProperty({
-    description: 'the pair you would like to add to your portfolio',
+    description: 'pair to add',
     example: 'BTC/USDT',
   })
   @IsString()
@@ -21,6 +21,7 @@ export class AddPortfolioPositionDto {
   @ApiProperty({
     description: 'the direction of the position',
     example: 'long',
+    enum: ['long', 'short'],
   })
   @IsString()
   direction: direction;
@@ -28,6 +29,7 @@ export class AddPortfolioPositionDto {
   @ApiProperty({
     description: 'the data source used to get the candles and compute the var',
     example: 'binance_future',
+    enum: ['binance_future'],
   })
   @IsString()
   dataSource: dataSource;

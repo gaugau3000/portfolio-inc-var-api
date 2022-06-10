@@ -23,7 +23,7 @@ export class CreatePortfolioParams {
 
   @ApiProperty({
     description:
-      'The zscore used for compute the portfolio var 1.645 for 90% confidence,1.96 for 95%,2.58 for 99%',
+      'The zscore used for compute the portfolio var 1.645 for 90% confidence, 1.96 for 95%, 2.58 for 99%',
     example: 1.645,
   })
   @IsDefined()
