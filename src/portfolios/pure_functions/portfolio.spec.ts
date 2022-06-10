@@ -32,12 +32,8 @@ describe('Given 1 have 1 long BTC position open in portfolio when i try to add n
   it('isBelowMaxOpenTradeSameSymbolSameDirection should be false ', async () => {
     expect(
       isBelowMaxOpenTradeSameSymbolSameDirection(
-        {
-          pair: 'BTC/USDT',
-          dollarAmount: 0,
-          direction: 'long',
-          dataSource: 'binance_future',
-        },
+        'BTC/USDT',
+        'long',
         [
           {
             pair: 'BTC/USDT',
@@ -56,16 +52,7 @@ describe('Given 1 have 1 long BTC position open in portfolio when i try to add n
 describe('Given i try to add new btc long and i have max 1 open trade per direction allowed and not position open', () => {
   it('isBelowMaxOpenTradeSameSymbolSameDirection should be true ', async () => {
     expect(
-      isBelowMaxOpenTradeSameSymbolSameDirection(
-        {
-          pair: 'BTC/USDT',
-          dollarAmount: 0,
-          direction: 'long',
-          dataSource: 'binance_future',
-        },
-        [],
-        1,
-      ),
+      isBelowMaxOpenTradeSameSymbolSameDirection('BTC/USDT', 'long', [], 1),
     ).toBeTruthy();
   });
 });
@@ -84,11 +71,11 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
         positionOpportunity: positionOpportunity,
         proposedVar: 100,
       },
-      state: {
+      portfolioState: {
         currentPositions: [],
         currentValueAtRisk: 0,
       },
-      constraints: {
+      portfolioConstraints: {
         maxVarInDollar: 200,
         maxOpenTradeSameSymbolSameDirection: 1,
       },
@@ -112,11 +99,11 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
         positionOpportunity: positionOpportunity,
         proposedVar: 100 + 110,
       },
-      state: {
+      portfolioState: {
         currentPositions: [],
         currentValueAtRisk: 100,
       },
-      constraints: {
+      portfolioConstraints: {
         maxVarInDollar: 200,
         maxOpenTradeSameSymbolSameDirection: 1,
       },
@@ -140,11 +127,11 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
         positionOpportunity: positionOpportunity,
         proposedVar: 250 - 30,
       },
-      state: {
+      portfolioState: {
         currentPositions: [],
         currentValueAtRisk: 250,
       },
-      constraints: {
+      portfolioConstraints: {
         maxVarInDollar: 200,
         maxOpenTradeSameSymbolSameDirection: 1,
       },

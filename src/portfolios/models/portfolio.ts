@@ -11,6 +11,10 @@ import {
 } from '../pure_functions/portfolio';
 import { timeframe, opportunityInfo } from '../interfaces/interfaces';
 import { computeVar } from '../pure_functions/value-at-risk';
+import {
+  addPositionRejectedUpperMaxTradeStatus,
+  addPositionRejectedUpperMaxVarStatus,
+} from '../status/status';
 
 export class Portfolio {
   maxVarInDollar: number;
@@ -40,21 +44,15 @@ export class Portfolio {
   async addPosition(
     positionOpportunity: positionOpportunity,
   ): Promise<addPositionResponse> {
-    const rejectedStatus: addPositionResponse = {
-      status: 'rejected',
-    };
-
     if (
       !isBelowMaxOpenTradeSameSymbolSameDirection(
-        positionOpportunity,
+        positionOpportunity.pair,
+        positionOpportunity.direction,
         this.currentPositions,
         this.maxOpenTradeSameSymbolSameDirection,
       )
     )
-      return {
-        ...rejectedStatus,
-        reason: 'upper the max open trades is the same direction',
-      };
+      return addPositionRejectedUpperMaxTradeStatus;
 
     const proposedVar = await computeVar(
       this.zscore,
@@ -68,12 +66,12 @@ export class Portfolio {
         positionOpportunity: positionOpportunity,
         proposedVar: proposedVar,
       },
-      state: {
+      portfolioState: {
         currentPositions: this.currentPositions,
         currentValueAtRisk: this.currentValueAtRisk,
       },
 
-      constraints: {
+      portfolioConstraints: {
         maxVarInDollar: this.maxVarInDollar,
         maxOpenTradeSameSymbolSameDirection:
           this.maxOpenTradeSameSymbolSameDirection,
@@ -85,11 +83,7 @@ export class Portfolio {
     );
 
     if (!isAcceptedOpportunityStatus)
-      return {
-        ...rejectedStatus,
-        reason:
-          'you cannot add this position because you will exceed max allowed var',
-      };
+      return addPositionRejectedUpperMaxVarStatus;
 
     const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
 

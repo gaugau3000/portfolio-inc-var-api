@@ -1,4 +1,5 @@
 import {
+  direction,
   position,
   positionOpportunity,
   positions,
@@ -7,15 +8,16 @@ import { uuid as uuidv4 } from 'uuidv4';
 import { opportunityInfo } from '../interfaces/interfaces';
 
 export function isBelowMaxOpenTradeSameSymbolSameDirection(
-  positionOpportunity: positionOpportunity,
-  positions: Array<position>,
+  positionOpportunityPair: string,
+  positionOpportunityDirection: direction,
+  openPositions: Array<position>,
   maxOpenTradeSameSymbolSameDirection: number,
 ): boolean {
   let nbOpenTradeCurrentSymbolSameDirection =
-    positionOpportunity.direction === 'long' ? 1 : -1;
+    positionOpportunityDirection === 'long' ? 1 : -1;
 
-  positions.forEach((position) => {
-    if (position.pair == positionOpportunity.pair) {
+  openPositions.forEach((position) => {
+    if (position.pair == positionOpportunityPair) {
       if (position.direction == 'long') nbOpenTradeCurrentSymbolSameDirection++;
       if (position.direction == 'short')
         nbOpenTradeCurrentSymbolSameDirection--;
@@ -34,18 +36,19 @@ export async function isAcceptedOpportunity(
 ): Promise<boolean> {
   if (
     !isBelowMaxOpenTradeSameSymbolSameDirection(
-      opportunityInfo.opportunity.positionOpportunity,
-      opportunityInfo.state.currentPositions,
-      opportunityInfo.constraints.maxOpenTradeSameSymbolSameDirection,
+      opportunityInfo.opportunity.positionOpportunity.pair,
+      opportunityInfo.opportunity.positionOpportunity.direction,
+      opportunityInfo.portfolioState.currentPositions,
+      opportunityInfo.portfolioConstraints.maxOpenTradeSameSymbolSameDirection,
     )
   )
     return false;
 
   if (
     opportunityInfo.opportunity.proposedVar >
-      opportunityInfo.constraints.maxVarInDollar &&
+      opportunityInfo.portfolioConstraints.maxVarInDollar &&
     opportunityInfo.opportunity.proposedVar >
-      opportunityInfo.state.currentValueAtRisk
+      opportunityInfo.portfolioState.currentValueAtRisk
   )
     return false;
 

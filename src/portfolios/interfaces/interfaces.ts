@@ -41,12 +41,12 @@ export type opportunityInfo = {
     positionOpportunity: positionOpportunity;
     proposedVar: number;
   };
-  state: {
+  portfolioState: {
     currentPositions: Array<position>;
     currentValueAtRisk: number;
   };
 
-  constraints: {
+  portfolioConstraints: {
     maxVarInDollar: number;
     maxOpenTradeSameSymbolSameDirection: number;
   };
