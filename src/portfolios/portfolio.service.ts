@@ -17,7 +17,7 @@ export class PortfolioService {
 
   update(portfolioUuid: string, updateUserDto: UpdatePortfolioDto) {
     const portfolio = this.portfolios.find(
-      (portfolio) => portfolio.uuid == portfolioUuid,
+      (portfolio) => portfolio.state.uuid == portfolioUuid,
     );
 
     if (portfolio === undefined)
@@ -26,9 +26,9 @@ export class PortfolioService {
       );
 
     updateUserDto.maxVarInDollar &&
-      (portfolio.maxVarInDollar = updateUserDto.maxVarInDollar);
+      (portfolio.constraints.maxVarInDollar = updateUserDto.maxVarInDollar);
     updateUserDto.maxOpenTradeSameSymbolSameDirection &&
-      (portfolio.maxOpenTradeSameSymbolSameDirection =
+      (portfolio.constraints.maxOpenTradeSameSymbolSameDirection =
         updateUserDto.maxOpenTradeSameSymbolSameDirection);
   }
 
@@ -38,7 +38,7 @@ export class PortfolioService {
 
   findByNameId(portfolioNameId: string): Portfolio {
     const findedPortfolio = this.portfolios.find(
-      (portfolio) => portfolio.nameId === portfolioNameId,
+      (portfolio) => portfolio.params.nameId === portfolioNameId,
     );
 
     if (findedPortfolio === undefined)
@@ -51,13 +51,13 @@ export class PortfolioService {
 
   delete(uuid: string) {
     this.portfolios = this.portfolios.filter(
-      (portfolio) => portfolio.uuid !== uuid,
+      (portfolio) => portfolio.state.uuid !== uuid,
     );
   }
 
   async removePortfolioPosition(portfolioId: string, positionId: string) {
     const portfolio = this.portfolios.find(
-      (portfolio) => portfolio.uuid == portfolioId,
+      (portfolio) => portfolio.state.uuid == portfolioId,
     );
 
     if (portfolio === undefined)
@@ -73,7 +73,7 @@ export class PortfolioService {
     addPortfolioPosition: AddPortfolioPositionDto,
   ): Promise<import('./interfaces/interfaces').addPositionResponse> {
     const portfolio = this.portfolios.find(
-      (portfolio) => portfolio.uuid === uuid,
+      (portfolio) => portfolio.state.uuid === uuid,
     );
 
     if (portfolio === undefined)
@@ -98,7 +98,8 @@ export class PortfolioService {
 
   create(createPortfolioDto: CreatePortfolioDto): { uuid: string } {
     const hasNameIdInPortfolios = this.portfolios.some(
-      (portfolio) => portfolio.nameId === createPortfolioDto.nameId,
+      (portfolio) =>
+        portfolio.params.nameId === createPortfolioDto.params.nameId,
     );
     if (hasNameIdInPortfolios)
       throw new ConflictException(
@@ -109,6 +110,6 @@ export class PortfolioService {
 
     this.portfolios.push(portfolio);
 
-    return { uuid: portfolio.uuid };
+    return { uuid: portfolio.state.uuid };
   }
 }

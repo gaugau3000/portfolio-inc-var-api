@@ -8,6 +8,8 @@ import { AppConfig } from './models/app-config';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '../config/configuration';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
+import { CreatePortfolioParams } from './dto/create-portfolio-params';
+import { CreatePortfolioConstraints } from './dto/create-portfolio-constraints';
 
 describe('PortfolioController', () => {
   let portfolioController: PortfolioController;
@@ -28,12 +30,16 @@ describe('PortfolioController', () => {
 
   describe('Portfolio Controller', () => {
     const portfolioAttributes: CreatePortfolioDto = {
-      maxVarInDollar: 200,
-      maxOpenTradeSameSymbolSameDirection: 1,
-      nbComputePeriods: 20,
-      zscore: 1.65,
-      timeframe: '15m',
-      nameId: 'crypto_15m',
+      params: new CreatePortfolioParams({
+        nbComputePeriods: 20,
+        zscore: 1.65,
+        timeframe: '1m',
+        nameId: 'crypto_15m',
+      }),
+      constraints: new CreatePortfolioConstraints({
+        maxVarInDollar: 200,
+        maxOpenTradeSameSymbolSameDirection: 1,
+      }),
     };
 
     const firstPortfolioPosition: AddPortfolioPositionDto = {
@@ -56,7 +62,7 @@ describe('PortfolioController', () => {
           portfolioController.create(portfolioAttributes).uuid;
         const portfolios = portfolioController.findAll();
         expect(portfolios.length).toBe(1);
-        expect(portfolios[0].uuid).toBe(portfolioUuid);
+        expect(portfolios[0].state.uuid).toBe(portfolioUuid);
       });
 
       describe('Given a portfolio and i had an allowed position', () => {
@@ -95,8 +101,8 @@ describe('PortfolioController', () => {
             portfolioController.create(portfolioAttributes).uuid;
 
           const findedPortfolioUuid = portfolioController.findByNameId(
-            portfolioAttributes.nameId,
-          ).uuid;
+            portfolioAttributes.params.nameId,
+          ).state.uuid;
 
           expect(portfolioUuid).toBe(findedPortfolioUuid);
         });
@@ -111,7 +117,9 @@ describe('PortfolioController', () => {
           };
           portfolioController.update(portfolioUuid, portfolioUpdateDto);
 
-          expect(portfolioController.findAll()[0].maxVarInDollar).toBe(100);
+          expect(
+            portfolioController.findAll()[0].constraints.maxVarInDollar,
+          ).toBe(100);
         });
       });
     });

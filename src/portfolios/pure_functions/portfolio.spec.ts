@@ -8,7 +8,9 @@ import {
 import {
   positions,
   positionOpportunity,
+  portfolioState,
   opportunityInfo,
+  portfolioConstraints,
 } from '../interfaces/interfaces';
 
 jest.mock('../pure_functions/candles', () => {
@@ -71,17 +73,26 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
         positionOpportunity: positionOpportunity,
         proposedVar: 100,
       },
-      portfolioState: {
-        currentPositions: [],
-        currentValueAtRisk: 0,
-      },
-      portfolioConstraints: {
-        maxVarInDollar: 200,
-        maxOpenTradeSameSymbolSameDirection: 1,
-      },
     };
 
-    expect(await isAcceptedOpportunity(opportunityInfo)).toBe(true);
+    const portfolioState: portfolioState = {
+      uuid: '',
+      positions: [],
+      valueAtRisk: 0,
+    };
+
+    const portfolioConstraints: portfolioConstraints = {
+      maxVarInDollar: 200,
+      maxOpenTradeSameSymbolSameDirection: 1,
+    };
+
+    expect(
+      await isAcceptedOpportunity(
+        opportunityInfo,
+        portfolioState,
+        portfolioConstraints,
+      ),
+    ).toBe(true);
   });
 });
 
@@ -99,17 +110,26 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
         positionOpportunity: positionOpportunity,
         proposedVar: 100 + 110,
       },
-      portfolioState: {
-        currentPositions: [],
-        currentValueAtRisk: 100,
-      },
-      portfolioConstraints: {
-        maxVarInDollar: 200,
-        maxOpenTradeSameSymbolSameDirection: 1,
-      },
     };
 
-    expect(await isAcceptedOpportunity(opportunityInfo)).toBe(false);
+    const portfolioState: portfolioState = {
+      uuid: '',
+      positions: [],
+      valueAtRisk: 100,
+    };
+
+    const portfolioConstraints: portfolioConstraints = {
+      maxVarInDollar: 200,
+      maxOpenTradeSameSymbolSameDirection: 1,
+    };
+
+    expect(
+      await isAcceptedOpportunity(
+        opportunityInfo,
+        portfolioState,
+        portfolioConstraints,
+      ),
+    ).toBe(false);
   });
 });
 
@@ -127,17 +147,26 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
         positionOpportunity: positionOpportunity,
         proposedVar: 250 - 30,
       },
-      portfolioState: {
-        currentPositions: [],
-        currentValueAtRisk: 250,
-      },
-      portfolioConstraints: {
-        maxVarInDollar: 200,
-        maxOpenTradeSameSymbolSameDirection: 1,
-      },
     };
 
-    expect(await isAcceptedOpportunity(opportunityInfo)).toBe(true);
+    const portfolioState: portfolioState = {
+      uuid: '',
+      positions: [],
+      valueAtRisk: 250,
+    };
+
+    const portfolioConstraints: portfolioConstraints = {
+      maxVarInDollar: 200,
+      maxOpenTradeSameSymbolSameDirection: 1,
+    };
+
+    expect(
+      await isAcceptedOpportunity(
+        opportunityInfo,
+        portfolioState,
+        portfolioConstraints,
+      ),
+    ).toBe(true);
   });
 });
 

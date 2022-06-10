@@ -3,6 +3,8 @@ import {
   position,
   positionOpportunity,
   positions,
+  portfolioState,
+  portfolioConstraints,
 } from '../interfaces/interfaces';
 import { uuid as uuidv4 } from 'uuidv4';
 import { opportunityInfo } from '../interfaces/interfaces';
@@ -33,22 +35,23 @@ export function isBelowMaxOpenTradeSameSymbolSameDirection(
 
 export async function isAcceptedOpportunity(
   opportunityInfo: opportunityInfo,
+  portfolioState: portfolioState,
+  portfolioConstraints: portfolioConstraints,
 ): Promise<boolean> {
   if (
     !isBelowMaxOpenTradeSameSymbolSameDirection(
       opportunityInfo.opportunity.positionOpportunity.pair,
       opportunityInfo.opportunity.positionOpportunity.direction,
-      opportunityInfo.portfolioState.currentPositions,
-      opportunityInfo.portfolioConstraints.maxOpenTradeSameSymbolSameDirection,
+      portfolioState.positions,
+      portfolioConstraints.maxOpenTradeSameSymbolSameDirection,
     )
   )
     return false;
 
   if (
     opportunityInfo.opportunity.proposedVar >
-      opportunityInfo.portfolioConstraints.maxVarInDollar &&
-    opportunityInfo.opportunity.proposedVar >
-      opportunityInfo.portfolioState.currentValueAtRisk
+      portfolioConstraints.maxVarInDollar &&
+    opportunityInfo.opportunity.proposedVar > portfolioState.valueAtRisk
   )
     return false;
 

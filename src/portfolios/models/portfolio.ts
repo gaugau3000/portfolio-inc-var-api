@@ -1,5 +1,8 @@
 import {
   addPositionResponse,
+  portfolioConstraints,
+  portfolioState,
+  portfolioParams,
   position,
   positionOpportunity,
 } from '../interfaces/interfaces';
@@ -9,7 +12,7 @@ import {
   isBelowMaxOpenTradeSameSymbolSameDirection,
   isAcceptedOpportunity,
 } from '../pure_functions/portfolio';
-import { timeframe, opportunityInfo } from '../interfaces/interfaces';
+import { opportunityInfo } from '../interfaces/interfaces';
 import { computeVar } from '../pure_functions/value-at-risk';
 import {
   addPositionRejectedUpperMaxTradeStatus,
@@ -17,28 +20,16 @@ import {
 } from '../status/status';
 
 export class Portfolio {
-  maxVarInDollar: number;
-  maxOpenTradeSameSymbolSameDirection: number;
-  nbComputePeriods: number;
-  zscore: number;
-  timeframe: timeframe;
-  uuid: string;
-  nameId: string;
+  constraints: portfolioConstraints;
 
-  currentPositions: Array<position>;
-  currentValueAtRisk: number;
+  params: portfolioParams;
+
+  state: portfolioState;
 
   constructor(obj: CreatePortfolioDto) {
-    this.maxVarInDollar = obj.maxVarInDollar;
-    this.maxOpenTradeSameSymbolSameDirection =
-      obj.maxOpenTradeSameSymbolSameDirection;
-    this.nbComputePeriods = obj.nbComputePeriods;
-    this.zscore = obj.zscore;
-    this.timeframe = obj.timeframe;
-    this.currentPositions = [];
-    this.uuid = uuid();
-    this.nameId = obj.nameId;
-    this.currentValueAtRisk = 0;
+    this.params = obj.params;
+    this.constraints = obj.constraints;
+    this.state = { positions: [], uuid: uuid(), valueAtRisk: 0 };
   }
 
   async addPosition(
@@ -48,17 +39,17 @@ export class Portfolio {
       !isBelowMaxOpenTradeSameSymbolSameDirection(
         positionOpportunity.pair,
         positionOpportunity.direction,
-        this.currentPositions,
-        this.maxOpenTradeSameSymbolSameDirection,
+        this.state.positions,
+        this.constraints.maxOpenTradeSameSymbolSameDirection,
       )
     )
       return addPositionRejectedUpperMaxTradeStatus;
 
     const proposedVar = await computeVar(
-      this.zscore,
-      [...this.currentPositions, positionOpportunity],
-      this.nbComputePeriods,
-      this.timeframe,
+      this.params.zscore,
+      [...this.state.positions, positionOpportunity],
+      this.params.nbComputePeriods,
+      this.params.timeframe,
     );
 
     const opportunityInfo: opportunityInfo = {
@@ -66,20 +57,12 @@ export class Portfolio {
         positionOpportunity: positionOpportunity,
         proposedVar: proposedVar,
       },
-      portfolioState: {
-        currentPositions: this.currentPositions,
-        currentValueAtRisk: this.currentValueAtRisk,
-      },
-
-      portfolioConstraints: {
-        maxVarInDollar: this.maxVarInDollar,
-        maxOpenTradeSameSymbolSameDirection:
-          this.maxOpenTradeSameSymbolSameDirection,
-      },
     };
 
     const isAcceptedOpportunityStatus = await isAcceptedOpportunity(
       opportunityInfo,
+      this.state,
+      this.constraints,
     );
 
     if (!isAcceptedOpportunityStatus)
@@ -87,9 +70,9 @@ export class Portfolio {
 
     const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
 
-    this.currentPositions.push(acceptedPosition);
+    this.state.positions.push(acceptedPosition);
 
-    this.currentValueAtRisk = proposedVar;
+    this.state.valueAtRisk = proposedVar;
 
     return {
       status: 'accepted',
@@ -98,15 +81,15 @@ export class Portfolio {
   }
 
   async removePosition(uuid: string): Promise<void> {
-    this.currentPositions = this.currentPositions.filter(
+    this.state.positions = this.state.positions.filter(
       (position) => position.uuid !== uuid,
     );
 
-    this.currentValueAtRisk = await computeVar(
-      this.zscore,
-      this.currentPositions,
-      this.nbComputePeriods,
-      this.timeframe,
+    this.state.valueAtRisk = await computeVar(
+      this.params.zscore,
+      this.state.positions,
+      this.params.nbComputePeriods,
+      this.params.timeframe,
     );
   }
 }

@@ -41,13 +41,22 @@ export type opportunityInfo = {
     positionOpportunity: positionOpportunity;
     proposedVar: number;
   };
-  portfolioState: {
-    currentPositions: Array<position>;
-    currentValueAtRisk: number;
-  };
-
-  portfolioConstraints: {
-    maxVarInDollar: number;
-    maxOpenTradeSameSymbolSameDirection: number;
-  };
 };
+
+export interface portfolioConstraints {
+  maxVarInDollar: number;
+  maxOpenTradeSameSymbolSameDirection: number;
+}
+
+export interface portfolioParams {
+  nbComputePeriods: number;
+  zscore: number;
+  timeframe: timeframe;
+  nameId: string;
+}
+
+export interface portfolioState {
+  uuid: string;
+  positions: Array<position>;
+  valueAtRisk: number;
+}

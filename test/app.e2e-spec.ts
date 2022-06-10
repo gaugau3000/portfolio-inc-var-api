@@ -2,9 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { CreatePortfolioDto } from 'src/portfolios/dto/create-portfolio.dto';
-import { AddPortfolioPositionDto } from 'src/portfolios/dto/add-portfolio-position.dto';
-import { UpdatePortfolioDto } from 'src/portfolios/dto/update-portfolio.dto';
+import { CreatePortfolioDto } from '../src/portfolios/dto/create-portfolio.dto';
+import { AddPortfolioPositionDto } from '../src/portfolios/dto/add-portfolio-position.dto';
+import { UpdatePortfolioDto } from '../src/portfolios/dto/update-portfolio.dto';
+import { CreatePortfolioParams } from '../src/portfolios/dto/create-portfolio-params';
+import { CreatePortfolioConstraints } from '../src/portfolios/dto/create-portfolio-constraints';
 
 // jest.mock('../src/portfolios/pure_functions/candles', () => {
 //   return {
@@ -51,13 +53,18 @@ describe('Portfolio Create a portfolio -> create position -> delete position ', 
 
     it('should return a 201 code (accepted)', () => {
       const createPortfolioDto: CreatePortfolioDto = {
-        maxVarInDollar: 100,
-        maxOpenTradeSameSymbolSameDirection: 1,
-        nbComputePeriods: 20,
-        zscore: 1.65,
-        timeframe: '1m',
-        nameId: 'crypto_15m',
+        params: new CreatePortfolioParams({
+          nbComputePeriods: 20,
+          zscore: 1.65,
+          timeframe: '1m',
+          nameId: 'crypto_15m',
+        }),
+        constraints: new CreatePortfolioConstraints({
+          maxVarInDollar: 100,
+          maxOpenTradeSameSymbolSameDirection: 1,
+        }),
       };
+
       return request(app.getHttpServer())
         .post('/portfolios')
         .send(createPortfolioDto)
@@ -109,16 +116,20 @@ describe('Portfolio Create a portfolio -> add allowed position -> add rejected p
 
     it('should give status rejected', async () => {
       const createPortfolioDto: CreatePortfolioDto = {
-        maxVarInDollar: 100,
-        maxOpenTradeSameSymbolSameDirection: 1,
-        nbComputePeriods: 20,
-        zscore: 1.65,
-        timeframe: '1m',
-        nameId: 'crypto_15m',
+        params: new CreatePortfolioParams({
+          nbComputePeriods: 20,
+          zscore: 1.65,
+          timeframe: '1m',
+          nameId: 'crypto_15m',
+        }),
+        constraints: new CreatePortfolioConstraints({
+          maxVarInDollar: 100,
+          maxOpenTradeSameSymbolSameDirection: 1,
+        }),
       };
       await request(app.getHttpServer())
         .post('/portfolios')
-        .send({ createPortfolioDto })
+        .send(createPortfolioDto)
         .expect((res) => {
           portfolioUuid = res.body.uuid;
         });
@@ -132,7 +143,7 @@ describe('Portfolio Create a portfolio -> add allowed position -> add rejected p
 
       await request(app.getHttpServer())
         .post(`/portfolios/${portfolioUuid}/positions`)
-        .send({ addPortfolioPositionAccepted });
+        .send(addPortfolioPositionAccepted);
 
       const addPortfolioPositionRejected: AddPortfolioPositionDto = {
         pair: 'ETH/USDT',
@@ -143,7 +154,7 @@ describe('Portfolio Create a portfolio -> add allowed position -> add rejected p
 
       await request(app.getHttpServer())
         .post(`/portfolios/${portfolioUuid}/positions`)
-        .send({ addPortfolioPositionRejected })
+        .send(addPortfolioPositionRejected)
         .expect(403);
     });
   });
@@ -166,12 +177,16 @@ describe('Portfolio Create a portfolio -> add allowed position -> change allowed
 
     it('should give status code 403 (forbidden) with message error "you cannot add this position because you will exceed max allowed var" ', async () => {
       const createPortfolioDto: CreatePortfolioDto = {
-        maxVarInDollar: 100000,
-        maxOpenTradeSameSymbolSameDirection: 1,
-        nbComputePeriods: 20,
-        zscore: 1.65,
-        timeframe: '15m',
-        nameId: 'crypto_15m',
+        params: new CreatePortfolioParams({
+          nbComputePeriods: 20,
+          zscore: 1.65,
+          timeframe: '1m',
+          nameId: 'crypto_15m',
+        }),
+        constraints: new CreatePortfolioConstraints({
+          maxVarInDollar: 100000,
+          maxOpenTradeSameSymbolSameDirection: 1,
+        }),
       };
       await request(app.getHttpServer())
         .post('/portfolios')
