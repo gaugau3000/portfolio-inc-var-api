@@ -34,6 +34,8 @@ import { PrismaService } from '../src/prisma.service';
 //   };
 // });
 
+jest.setTimeout(20000);
+
 let app: INestApplication;
 let prisma: PrismaService;
 async function initApp() {
