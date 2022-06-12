@@ -9,7 +9,7 @@ services:
     command: sh -c "cd /home/node/portfolio-inc-var-api && yarn install  && npx prisma migrate dev  && yarn run test:ci && yarn run test:e2e"
     env_file:
     - test.env
-    user: node
+    user: root
 
     depends_on:
       - "db"
