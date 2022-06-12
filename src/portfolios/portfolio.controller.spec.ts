@@ -2,16 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { PortfolioController } from './portfolio.controller';
 import { PortfolioService } from './portfolio.service';
-import { isUuid } from 'uuidv4';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
 import { AppConfig } from './models/app-config';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '../config/configuration';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
-import { CreatePortfolioParams } from './dto/create-portfolio-params';
-import { CreatePortfolioConstraints } from './dto/create-portfolio-constraints';
+import { PrismaService } from '../prisma.service';
+import {
+  Prisma,
+  Portfolio as PrismaPortfolio,
+  Position as PrismaPosition,
+} from '@prisma/client';
 
 describe('PortfolioController', () => {
+  let prisma: PrismaService;
   let portfolioController: PortfolioController;
 
   beforeEach(async () => {
@@ -22,24 +26,35 @@ describe('PortfolioController', () => {
         }),
       ],
       controllers: [PortfolioController],
-      providers: [PortfolioService, AppConfig],
+      providers: [PortfolioService, AppConfig, PrismaService],
     }).compile();
 
     portfolioController = app.get<PortfolioController>(PortfolioController);
+    prisma = app.get<PrismaService>(PrismaService);
   });
 
   describe('Portfolio Controller', () => {
     const portfolioAttributes: CreatePortfolioDto = {
-      params: new CreatePortfolioParams({
+      params: {
         nbComputePeriods: 20,
         zscore: 1.65,
         timeframe: '1m',
         nameId: 'crypto_15m',
-      }),
-      constraints: new CreatePortfolioConstraints({
+      },
+      constraints: {
         maxVarInDollar: 200,
         maxOpenTradeSameSymbolSameDirection: 1,
-      }),
+      },
+    };
+
+    const prismaPortfolio: PrismaPortfolio = {
+      id: 1,
+      maxVarInDollar: 200,
+      maxOpenTradeSameSymbolSameDirection: 1,
+      nbComputePeriods: 20,
+      zscore: 1.65,
+      timeframe: '1m',
+      nameId: 'crypto_15m',
     };
 
     const firstPortfolioPosition: AddPortfolioPositionDto = {
@@ -48,77 +63,154 @@ describe('PortfolioController', () => {
       direction: 'long',
       dataSource: 'binance_future',
     };
-    describe('When I create a portfolio', () => {
-      it('then it should return an uuid string', () => {
-        const portfolioUuid =
-          portfolioController.create(portfolioAttributes).uuid;
-        expect(isUuid(portfolioUuid)).toBeTruthy();
+
+    describe('When I create a portfolio then', () => {
+      it('should return an object with id=1', async () => {
+        prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+        const portfolioId = (
+          await portfolioController.create(portfolioAttributes)
+        ).id;
+        expect(portfolioId).toBe(1);
       });
     });
 
-    describe('When I create a portfolio and i get all portfolios', () => {
-      it('then it should return an array of portfolio with length 1 and uuid of the portfolio should be the same with the one get', () => {
-        const portfolioUuid =
-          portfolioController.create(portfolioAttributes).uuid;
-        const portfolios = portfolioController.findAll();
+    describe('When I create a portfolio and i get all portfolios then', () => {
+      it('should return an array of portfolio with length 1 and id of the portfolio should be the same with the one get', async () => {
+        prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+        prisma.portfolio.findMany = jest
+          .fn()
+          .mockReturnValue([{ ...prismaPortfolio, positions: [] }]);
+        const portfolioId = (
+          await portfolioController.create(portfolioAttributes)
+        ).id;
+        const portfolios = await portfolioController.findAll();
         expect(portfolios.length).toBe(1);
-        expect(portfolios[0].state.uuid).toBe(portfolioUuid);
+        expect(portfolios[0].state.id).toBe(portfolioId);
       });
 
-      describe('Given a portfolio and i had an allowed position', () => {
-        it('then it should return an accepted response with uuid', async () => {
-          const portfolioUuid =
-            portfolioController.create(portfolioAttributes).uuid;
-          const positionResponse = portfolioController.addPortfolioPosition(
-            portfolioUuid,
-            firstPortfolioPosition,
-          );
-          const positionUuid = (await positionResponse).uuid;
-          expect(isUuid(positionUuid)).toBeTruthy();
-          expect((await positionResponse).status).toBe('accepted');
+      describe('Given a portfolio when i had an allowed position then', () => {
+        it('should return an accepted status and id=1', async () => {
+          prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+          prisma.portfolio.findUnique = jest
+            .fn()
+            .mockReturnValue({ ...prismaPortfolio, positions: [] });
+          prisma.position.create = jest.fn().mockReturnValue({
+            id: 1,
+            pair: 'BTC/USDT',
+            dollarAmount: 100,
+            direction: 'long',
+            dataSource: 'binance_future',
+            portfolioId: 1,
+          });
+          const portfolioId = (
+            await portfolioController.create(portfolioAttributes)
+          ).id;
+          const positionResponse =
+            await portfolioController.addPortfolioPosition(
+              portfolioId.toString(),
+              firstPortfolioPosition,
+            );
+
+          expect(positionResponse.id).toBe(1);
+          expect(positionResponse.status).toBe('accepted');
         });
       });
 
-      describe('Given I create a portfolio and i add an allowed position when i remove the position', () => {
-        it('then it should return a validated response', async () => {
-          const portfolioUuid =
-            portfolioController.create(portfolioAttributes).uuid;
-          const positionResponse = portfolioController.addPortfolioPosition(
-            portfolioUuid,
-            firstPortfolioPosition,
-          );
-          const positionUuid = (await positionResponse).uuid;
-          portfolioController.removePortfolioPosition(
-            portfolioUuid,
-            positionUuid,
-          );
+      describe('Given a portfolio and i add an allowed position when i remove the position then', () => {
+        it('should return undefined ', async () => {
+          prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+          prisma.portfolio.findUnique = jest
+            .fn()
+            .mockReturnValue({ ...prismaPortfolio, positions: [] });
+          prisma.position.create = jest.fn().mockReturnValue({
+            id: 1,
+            pair: 'BTC/USDT',
+            dollarAmount: 100,
+            direction: 'long',
+            dataSource: 'binance_future',
+            portfolioId: 1,
+          });
+
+          prisma.position.delete = jest.fn().mockReturnValue(undefined);
+
+          const portfolioId = (
+            await portfolioController.create(portfolioAttributes)
+          ).id;
+          const positionResponse =
+            await portfolioController.addPortfolioPosition(
+              portfolioId.toString(),
+              firstPortfolioPosition,
+            );
+
+          expect(
+            portfolioController.removePortfolioPosition(
+              portfolioId.toString(),
+              positionResponse.id.toString(),
+            ),
+          ).toBeUndefined;
         });
       });
 
-      describe('Given I create a portfolio and i get it by nameId', () => {
-        it('then it should return the portfolio this the same uuid', async () => {
-          const portfolioUuid =
-            portfolioController.create(portfolioAttributes).uuid;
+      describe('Given I create a portfolio with id=1 when i find it using nameId then', () => {
+        it('should return the portfolio with id=1', async () => {
+          prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+          const portfolioId = (
+            await portfolioController.create(portfolioAttributes)
+          ).id;
 
-          const findedPortfolioUuid = portfolioController.findByNameId(
-            portfolioAttributes.params.nameId,
-          ).state.uuid;
+          const findPrismaPortfolio: PrismaPortfolio & {
+            positions: PrismaPosition[];
+          } = {
+            ...prismaPortfolio,
+            positions: [
+              {
+                portfolioId: 1,
+                id: 1,
+                pair: 'BTC/USDT',
+                dollarAmount: 100,
+                direction: 'long',
+                dataSource: 'binance_future',
+              },
+            ],
+          };
 
-          expect(portfolioUuid).toBe(findedPortfolioUuid);
+          prisma.portfolio.findUnique = jest
+            .fn()
+            .mockReturnValue(findPrismaPortfolio);
+
+          const findedPortfolioId = (
+            await portfolioController.findByNameId(
+              portfolioAttributes.params.nameId,
+            )
+          ).state.id;
+
+          expect(portfolioId).toBe(findedPortfolioId);
         });
       });
 
-      describe('Given I create a portfolio of max mar is 200 and I change the var to 100 and i list all portfolios', () => {
-        it('then the portfolio should have var of 100 dollar', async () => {
-          const portfolioUuid =
-            portfolioController.create(portfolioAttributes).uuid;
+      describe('Given I have a portfolio of max mar is 200 and I update the var to 100 when i list all portfolios then the first portfolio finded', () => {
+        it('should have var of 100 dollar', async () => {
+          prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+          const updatePortfolio = prismaPortfolio;
+          updatePortfolio['maxVarInDollar'] = 100;
+          updatePortfolio['positions'] = [];
+          prisma.portfolio.update = jest.fn().mockReturnValue(updatePortfolio);
+          prisma.portfolio.findMany = jest
+            .fn()
+            .mockReturnValue([updatePortfolio]);
+          const portfolioId = (
+            await portfolioController.create(portfolioAttributes)
+          ).id;
           const portfolioUpdateDto: UpdatePortfolioDto = {
             maxVarInDollar: 100,
           };
-          portfolioController.update(portfolioUuid, portfolioUpdateDto);
+          portfolioController.update(
+            portfolioId.toString(),
+            portfolioUpdateDto,
+          );
 
           expect(
-            portfolioController.findAll()[0].constraints.maxVarInDollar,
+            (await portfolioController.findAll())[0].constraints.maxVarInDollar,
           ).toBe(100);
         });
       });

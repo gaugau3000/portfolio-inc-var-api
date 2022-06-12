@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  portfolio-inc-var-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/home/node/portfolio-inc-var-api
+      - ~/.gitconfig:/home/node/.gitconfig:ro
+      - portfolio-inc-var-api-bashhistory:/home/node/commandhistory
+      - portfolio-inc-var-api-vscode-server:/home/node/.vscode-server
+      - portfolio-inc-var-api-server-insiders:/home/node/.vscode-server-insiders
+      
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    # network_mode: service:db
+
+    # Uncomment the next line to use a non-root user for all processes.
+    user: node
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - ../scripts/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    environment:
+      POSTGRES_PASSWORD: postgres
+
+networks:
+  default:
+    name: trading_bots
+    external: true
+
+volumes:
+  portfolio-inc-var-api-bashhistory:
+  portfolio-inc-var-api-vscode-server:
+  portfolio-inc-var-api-server-insiders:
+ 

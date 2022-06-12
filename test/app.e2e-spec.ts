@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { CreatePortfolioDto } from '../src/portfolios/dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from '../src/portfolios/dto/add-portfolio-position.dto';
 import { UpdatePortfolioDto } from '../src/portfolios/dto/update-portfolio.dto';
-import { CreatePortfolioParams } from '../src/portfolios/dto/create-portfolio-params';
-import { CreatePortfolioConstraints } from '../src/portfolios/dto/create-portfolio-constraints';
+import { PrismaService } from '../src/prisma.service';
 
 // jest.mock('../src/portfolios/pure_functions/candles', () => {
 //   return {
@@ -35,125 +34,148 @@ import { CreatePortfolioConstraints } from '../src/portfolios/dto/create-portfol
 //   };
 // });
 
-describe('Portfolio Create a portfolio -> create position -> delete position ', () => {
-  let app: INestApplication;
+let app: INestApplication;
+let prisma: PrismaService;
+async function initApp() {
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
 
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+  app = moduleFixture.createNestApplication();
+  app.useGlobalPipes(new ValidationPipe({ enableDebugMessages: true }));
+  await app.init();
+  prisma = app.get<PrismaService>(PrismaService);
+  await prisma.position.deleteMany({});
+  await prisma.portfolio.deleteMany({});
+}
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+describe('Portfolio Create a portfolio -> create allowed position -> delete position ', () => {
+  beforeEach(async () => {
+    await initApp();
   });
 
-  describe('Create a portfolio with max var of 100, max open trade of 1 on 1 min tf', () => {
-    let portfolioUuid = '';
-    let positionUUid = '';
+  const createPortfolioDto: CreatePortfolioDto = {
+    params: {
+      nbComputePeriods: 20,
+      zscore: 1.65,
+      timeframe: '1m',
+      nameId: 'crypto_15m',
+    },
+    constraints: {
+      maxVarInDollar: 100,
+      maxOpenTradeSameSymbolSameDirection: 1,
+    },
+  };
 
+  const addAcceptedPortfolioPosition: AddPortfolioPositionDto = {
+    pair: 'BTC/USDT',
+    dollarAmount: 100,
+    direction: 'long',
+    dataSource: 'binance_future',
+  };
+
+  describe('When I create a portfolio with max var of 100, max open trade of 1 on 1 min tf then', () => {
     it('should return a 201 code (accepted)', () => {
-      const createPortfolioDto: CreatePortfolioDto = {
-        params: new CreatePortfolioParams({
-          nbComputePeriods: 20,
-          zscore: 1.65,
-          timeframe: '1m',
-          nameId: 'crypto_15m',
-        }),
-        constraints: new CreatePortfolioConstraints({
-          maxVarInDollar: 100,
-          maxOpenTradeSameSymbolSameDirection: 1,
-        }),
-      };
-
       return request(app.getHttpServer())
         .post('/portfolios')
         .send(createPortfolioDto)
-        .expect((res) => {
-          portfolioUuid = res.body.uuid;
-        })
         .expect(201);
     });
+  });
 
-    it('and add an allowed position should return a 201 (accepted) code', () => {
-      const addPortfolioPosition: AddPortfolioPositionDto = {
-        pair: 'BTC/USDT',
-        dollarAmount: 100,
-        direction: 'long',
-        dataSource: 'binance_future',
-      };
+  describe('When I create a portfolio with max var of 100, max open trade of 1 on 1 min tf and add an allowed position then', () => {
+    it('should return a 201 (accepted) code', async () => {
+      let portfolioId = 0;
+
+      await request(app.getHttpServer())
+        .post('/portfolios')
+        .send(createPortfolioDto)
+        .expect((res) => {
+          portfolioId = res.body.id;
+        });
 
       return request(app.getHttpServer())
-        .post(`/portfolios/${portfolioUuid}/positions`)
-        .send(addPortfolioPosition)
-        .expect((res) => {
-          positionUUid = res.body.uuid;
-        })
+        .post(`/portfolios/${portfolioId}/positions`)
+        .send(addAcceptedPortfolioPosition)
         .expect(201);
     });
+  });
 
-    it('and delete last position should return a 200 (ok) code', () => {
+  describe('When I create a portfolio with max var of 100, max open trade of 1 on 1 min tf and I add an allowed position when i delete this position then', () => {
+    it('should return a 200 (ok) code', async () => {
+      let portfolioId = 0;
+      let positionId = 0;
+
+      await request(app.getHttpServer())
+        .post('/portfolios')
+        .send(createPortfolioDto)
+        .expect((res) => {
+          portfolioId = res.body.id;
+        });
+
+      await request(app.getHttpServer())
+        .post(`/portfolios/${portfolioId}/positions`)
+        .send(addAcceptedPortfolioPosition)
+        .expect((res) => {
+          positionId = res.body.id;
+        });
+
       return request(app.getHttpServer())
-        .delete(`/portfolios/${portfolioUuid}/positions/${positionUUid}`)
+        .delete(`/portfolios/${portfolioId}/positions/${positionId}`)
         .expect(200);
     });
   });
 });
 
 describe('Portfolio Create a portfolio -> add allowed position -> add rejected position  ', () => {
-  let app: INestApplication;
-
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    await initApp();
   });
 
-  describe('Create a portfolio with max var of 100, max open trade of 1 on 1 min tf and an accepted position and add a rejected position ', () => {
-    let portfolioUuid = '';
+  const createPortfolioDto: CreatePortfolioDto = {
+    params: {
+      nbComputePeriods: 20,
+      zscore: 1.65,
+      timeframe: '1m',
+      nameId: 'crypto_15m',
+    },
+    constraints: {
+      maxVarInDollar: 100,
+      maxOpenTradeSameSymbolSameDirection: 1,
+    },
+  };
 
-    it('should give status rejected', async () => {
-      const createPortfolioDto: CreatePortfolioDto = {
-        params: new CreatePortfolioParams({
-          nbComputePeriods: 20,
-          zscore: 1.65,
-          timeframe: '1m',
-          nameId: 'crypto_15m',
-        }),
-        constraints: new CreatePortfolioConstraints({
-          maxVarInDollar: 100,
-          maxOpenTradeSameSymbolSameDirection: 1,
-        }),
-      };
+  const addPortfolioPositionAccepted: AddPortfolioPositionDto = {
+    pair: 'BTC/USDT',
+    dollarAmount: 100,
+    direction: 'short',
+    dataSource: 'binance_future',
+  };
+
+  const addPortfolioPositionRejected: AddPortfolioPositionDto = {
+    pair: 'ETH/USDT',
+    dollarAmount: 1000000,
+    direction: 'short',
+    dataSource: 'binance_future',
+  };
+
+  describe('Create a portfolio with max var of 100, max open trade of 1 on 1 min tf and add an accepted position when I add a rejected position ', () => {
+    let portfolioId = '';
+
+    it('should give status forbidden (403)', async () => {
       await request(app.getHttpServer())
         .post('/portfolios')
         .send(createPortfolioDto)
         .expect((res) => {
-          portfolioUuid = res.body.uuid;
+          portfolioId = res.body.id;
         });
 
-      const addPortfolioPositionAccepted: AddPortfolioPositionDto = {
-        pair: 'BTC/USDT',
-        dollarAmount: 100,
-        direction: 'short',
-        dataSource: 'binance_future',
-      };
-
       await request(app.getHttpServer())
-        .post(`/portfolios/${portfolioUuid}/positions`)
+        .post(`/portfolios/${portfolioId}/positions`)
         .send(addPortfolioPositionAccepted);
 
-      const addPortfolioPositionRejected: AddPortfolioPositionDto = {
-        pair: 'ETH/USDT',
-        dollarAmount: 1000000,
-        direction: 'short',
-        dataSource: 'binance_future',
-      };
-
-      await request(app.getHttpServer())
-        .post(`/portfolios/${portfolioUuid}/positions`)
+      return request(app.getHttpServer())
+        .post(`/portfolios/${portfolioId}/positions`)
         .send(addPortfolioPositionRejected)
         .expect(403);
     });
@@ -161,68 +183,64 @@ describe('Portfolio Create a portfolio -> add allowed position -> add rejected p
 });
 
 describe('Portfolio Create a portfolio -> add allowed position -> change allowed var -> add rejected position ', () => {
-  let app: INestApplication;
-
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+  beforeEach(async () => {
+    await initApp();
   });
 
-  describe('Create a portfolio with max var of 100000, max open trade of 1 on 1 min tf and an accepted position and add a rejected position upper accepted var ', () => {
-    let portfolioUuid = '';
+  describe('Create a portfolio with max var of 100000, max open trade of 1 on 1 min tf and add an accepted position when i had position upper var allowed then', () => {
+    let portfolioId = '';
+
+    const createPortfolioDto: CreatePortfolioDto = {
+      params: {
+        nbComputePeriods: 20,
+        zscore: 1.65,
+        timeframe: '1m',
+        nameId: 'crypto_15m',
+      },
+      constraints: {
+        maxVarInDollar: 100000,
+        maxOpenTradeSameSymbolSameDirection: 1,
+      },
+    };
+
+    const addPortfolioPositionAccepted: AddPortfolioPositionDto = {
+      pair: 'BTC/USDT',
+      dollarAmount: 1000000,
+      direction: 'long',
+      dataSource: 'binance_future',
+    };
+
+    const updatePortfolioDto: UpdatePortfolioDto = {
+      maxVarInDollar: 1,
+    };
+
+    const addPortfolioPositionRejected: AddPortfolioPositionDto = {
+      pair: 'ETH/USDT',
+      dollarAmount: 1,
+      direction: 'long',
+      dataSource: 'binance_future',
+    };
 
     it('should give status code 403 (forbidden) with message error "you cannot add this position because you will exceed max allowed var" ', async () => {
-      const createPortfolioDto: CreatePortfolioDto = {
-        params: new CreatePortfolioParams({
-          nbComputePeriods: 20,
-          zscore: 1.65,
-          timeframe: '1m',
-          nameId: 'crypto_15m',
-        }),
-        constraints: new CreatePortfolioConstraints({
-          maxVarInDollar: 100000,
-          maxOpenTradeSameSymbolSameDirection: 1,
-        }),
-      };
+      let error = '';
       await request(app.getHttpServer())
         .post('/portfolios')
         .send(createPortfolioDto)
         .expect((res) => {
-          portfolioUuid = res.body.uuid;
+          portfolioId = res.body.id;
         });
 
-      const addPortfolioPositionAccepted: AddPortfolioPositionDto = {
-        pair: 'BTC/USDT',
-        dollarAmount: 1000000,
-        direction: 'long',
-        dataSource: 'binance_future',
-      };
-
       await request(app.getHttpServer())
-        .post(`/portfolios/${portfolioUuid}/positions`)
+        .post(`/portfolios/${portfolioId}/positions`)
         .send(addPortfolioPositionAccepted);
 
-      const updatePortfolioDto: UpdatePortfolioDto = {
-        maxVarInDollar: 1,
-      };
       await request(app.getHttpServer())
-        .patch(`/portfolios/${portfolioUuid}`)
+        .patch(`/portfolios/${portfolioId}`)
         .send(updatePortfolioDto)
         .expect(200);
 
-      const addPortfolioPositionRejected: AddPortfolioPositionDto = {
-        pair: 'ETH/USDT',
-        dollarAmount: 1,
-        direction: 'long',
-        dataSource: 'binance_future',
-      };
-      let error = '';
       await request(app.getHttpServer())
-        .post(`/portfolios/${portfolioUuid}/positions`)
+        .post(`/portfolios/${portfolioId}/positions`)
         .send(addPortfolioPositionRejected)
         .expect((res) => {
           error = res.body.error;

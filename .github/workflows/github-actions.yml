@@ -1,38 +1,32 @@
 name: portfolio-inc-var-api CI
 on:
   push:
-    branches: [ master ]
+    branches: [ master , develop ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
 
 env:
   NODE_ENV: test
 
 jobs:
   test:
+    name: Run All tests
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x]
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    - run: npm run test:ci
-    - run: npm run test:e2e
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: run ci in containers
+        run: docker-compose -f docker-compose.test.yml run portfolio-inc-var-api
 
   push_to_registry:
+    if: github.ref == 'refs/heads/master'
     needs: test
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
+      
       
       - name: Log in to Docker Hub
         uses: docker/login-action@v2

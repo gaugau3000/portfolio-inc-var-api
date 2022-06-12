@@ -8,8 +8,8 @@ export class addPortfolioPositionResponse {
   status: string;
 
   @ApiProperty({
-    example: '168cb24d-a2fb-4df5-8add-264ea7de9d6e',
-    description: 'uuid of the position',
+    example: 1,
+    description: 'id of the position',
   })
-  uuid?: string;
+  id?: number;
 }

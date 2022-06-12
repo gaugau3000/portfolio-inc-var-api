@@ -14,52 +14,54 @@ import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { AddPortfolioPositionDto } from './dto/add-portfolio-position.dto';
 import { PortfolioService } from './portfolio.service';
 import { createPortfolioResponse } from './responses/create-portfolio-response';
-import { addPortfolioPositionResponse } from './responses/add-portfolio-position-response';
 import { Portfolio } from './models/portfolio';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
+import { addPositionResponse } from './interfaces/interfaces';
 
 @Controller('portfolios')
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
+  @Post()
+  async create(
+    @Body() createPortfolioDto: CreatePortfolioDto,
+  ): Promise<createPortfolioResponse> {
+    return this.portfolioService.create(createPortfolioDto);
+  }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  findAll(): Array<Portfolio> {
+  async findAll(): Promise<Portfolio[]> {
     return this.portfolioService.findAll();
   }
 
   @Get('findByName')
-  findByNameId(@Query('portfolio_name_id') portfolioNameId: string): Portfolio {
+  async findByNameId(
+    @Query('portfolio_name_id') portfolioNameId: string,
+  ): Promise<Portfolio> {
     return this.portfolioService.findByNameId(portfolioNameId);
   }
 
-  @Post()
-  create(
-    @Body() createPortfolioDto: CreatePortfolioDto,
-  ): createPortfolioResponse {
-    return this.portfolioService.create(createPortfolioDto);
-  }
-
-  @Patch(':uuid')
+  @Patch(':id')
   update(
-    @Param('uuid') uuid: string,
+    @Param('id') id: string,
     @Body() updatePortfolioDto: UpdatePortfolioDto,
   ) {
-    return this.portfolioService.update(uuid, updatePortfolioDto);
+    return this.portfolioService.update(parseInt(id), updatePortfolioDto);
   }
 
-  @Delete(':uuid')
-  delete(@Param('uuid') uuid: string) {
-    return this.portfolioService.delete(uuid);
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.portfolioService.delete(parseInt(id));
   }
 
   @Post(':id/positions')
   async addPortfolioPosition(
     @Param('id') id: string,
     @Body() addPortfolioPosition: AddPortfolioPositionDto,
-  ): Promise<addPortfolioPositionResponse> {
+  ): Promise<addPositionResponse> {
     return await this.portfolioService.addPortfolioPosition(
-      id,
+      parseInt(id),
       addPortfolioPosition,
     );
   }
@@ -68,10 +70,10 @@ export class PortfolioController {
   removePortfolioPosition(
     @Param('portfolioId') portfolioId: string,
     @Param('positionId') positionId: string,
-  ) {
+  ): Promise<void> {
     return this.portfolioService.removePortfolioPosition(
-      portfolioId,
-      positionId,
+      parseInt(portfolioId),
+      parseInt(positionId),
     );
   }
 }

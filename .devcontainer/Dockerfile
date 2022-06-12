@@ -10,6 +10,7 @@ RUN mkdir /home/node/portfolio-inc-var-api
 WORKDIR /home/node/portfolio-inc-var-api
 
 RUN mkdir -p ${HOME}/commandhistory \
+    && mkdir -p ${HOME}/.vscode-server ${HOME}/.vscode-server-insiders ${HOME}/commandhistory \
     && echo "eval \$(ssh-agent) && ssh-add ~/.ssh/id_rsa"  >> ${HOME}/.bashrc \
     && echo "export PROMPT_COMMAND='history -a'" >> ${HOME}/.bashrc \
     && echo "export HISTFILE=~/commandhistory/.bash_history" >> ${HOME}/.bashrc
