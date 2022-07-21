@@ -52,14 +52,14 @@ describe('A portfolio with BTC and ETH ', () => {
       dollarAmount: 1000,
       direction: 'long',
       id: 1,
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
     const ethPosition: position = {
       pair: 'ETH/USDT',
       dollarAmount: 1000,
       direction: 'long',
       id: 2,
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     expect(await computeVar(1.65, [btcPosition, ethPosition], 20, '1h')).toBe(

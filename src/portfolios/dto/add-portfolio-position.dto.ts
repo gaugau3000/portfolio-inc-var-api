@@ -28,8 +28,8 @@ export class AddPortfolioPositionDto {
 
   @ApiProperty({
     description: 'the data source used to get the candles and compute the var',
-    example: 'binance_future',
-    enum: ['binance_future'],
+    example: 'binance_futures',
+    enum: ['binance_futures'],
   })
   @IsString()
   dataSource: dataSource;

@@ -31,7 +31,7 @@ export async function getAssetLastCloses(
     },
   });
   let ohlc;
-  if (dataSource === 'binance_future')
+  if (dataSource === 'binance_futures')
     ohlc = await binanceFuture.fetchOHLCV(pair, timeframe);
   else throw new Error(`${dataSource} is not implemented has data source`);
 

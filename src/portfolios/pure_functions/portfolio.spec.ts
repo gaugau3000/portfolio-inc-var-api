@@ -40,7 +40,7 @@ describe('Given 1 have 1 long BTC position open in portfolio when i try to add n
             dollarAmount: 0,
             direction: 'long',
             id: 1,
-            dataSource: 'binance_future',
+            dataSource: 'binance_futures',
           },
         ],
         1,
@@ -63,7 +63,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
       pair: 'BTC/USDT',
       dollarAmount: 0,
       direction: 'long',
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     const opportunityInfo: opportunityInfo = {
@@ -100,7 +100,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
       pair: 'ETH/USDT',
       dollarAmount: 0,
       direction: 'long',
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     const opportunityInfo: opportunityInfo = {
@@ -137,7 +137,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
       pair: 'ETH/USDT',
       dollarAmount: 0,
       direction: 'long',
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     const opportunityInfo: opportunityInfo = {
@@ -174,7 +174,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
 //       pair: 'BTC/USDT',
 //       dollarAmount: 100,
 //       direction: 'long',
-//       dataSource: 'binance_future',
+//       dataSource: 'binance_futures',
 //     };
 
 //     const oldPositions: positions = [
@@ -183,7 +183,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
 //         dollarAmount: 100,
 //         direction: 'long',
 //         id: 1,
-//         dataSource: 'binance_future',
+//         dataSource: 'binance_futures',
 //       },
 //     ];
 
@@ -200,7 +200,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
 //         dollarAmount: 100,
 //         direction: 'long',
 //         id: 1,
-//         dataSource: 'binance_future',
+//         dataSource: 'binance_futures',
 //       },
 //     ];
 

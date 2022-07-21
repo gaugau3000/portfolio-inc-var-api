@@ -1,5 +1,10 @@
 export type direction = 'long' | 'short';
 
+export enum SupportedExchanges {
+  BinanceFutures = 'binance_futures',
+  BinanceSpot = 'binance_spot',
+}
+
 export interface positionOpportunity {
   pair: string;
   dollarAmount: number;
@@ -34,7 +39,7 @@ export interface addPositionResponse {
   reason?: string;
 }
 
-export type dataSource = 'binance_future';
+export type dataSource = 'binance_futures';
 
 export type opportunityInfo = {
   opportunity: {

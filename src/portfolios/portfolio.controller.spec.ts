@@ -61,7 +61,7 @@ describe('PortfolioController', () => {
       pair: 'BTC/USDT',
       dollarAmount: 100,
       direction: 'long',
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     describe('When I create a portfolio then', () => {
@@ -99,7 +99,7 @@ describe('PortfolioController', () => {
             pair: 'BTC/USDT',
             dollarAmount: 100,
             direction: 'long',
-            dataSource: 'binance_future',
+            dataSource: 'binance_futures',
             portfolioId: 1,
           });
           const portfolioId = (
@@ -127,7 +127,7 @@ describe('PortfolioController', () => {
             pair: 'BTC/USDT',
             dollarAmount: 100,
             direction: 'long',
-            dataSource: 'binance_future',
+            dataSource: 'binance_futures',
             portfolioId: 1,
           });
 
@@ -169,7 +169,7 @@ describe('PortfolioController', () => {
                 pair: 'BTC/USDT',
                 dollarAmount: 100,
                 direction: 'long',
-                dataSource: 'binance_future',
+                dataSource: 'binance_futures',
               },
             ],
           };

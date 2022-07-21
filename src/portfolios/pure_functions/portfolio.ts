@@ -67,7 +67,7 @@ export async function isAcceptedOpportunity(
 //     pair: positionOpportunity.pair,
 //     direction: positionOpportunity.direction,
 //     dollarAmount: positionOpportunity.dollarAmount,
-//     dataSource: 'binance_future',
+//     dataSource: 'binance_futures',
 //   };
 //   positions.push(position);
 //   return positions;

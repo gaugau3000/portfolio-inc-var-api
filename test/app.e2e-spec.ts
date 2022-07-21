@@ -73,7 +73,7 @@ describe('Portfolio Create a portfolio -> create allowed position -> delete posi
     pair: 'BTC/USDT',
     dollarAmount: 100,
     direction: 'long',
-    dataSource: 'binance_future',
+    dataSource: 'binance_futures',
   };
 
   describe('When I create a portfolio with max var of 100, max open trade of 1 on 1 min tf then', () => {
@@ -151,14 +151,14 @@ describe('Portfolio Create a portfolio -> add allowed position -> add rejected p
     pair: 'BTC/USDT',
     dollarAmount: 100,
     direction: 'short',
-    dataSource: 'binance_future',
+    dataSource: 'binance_futures',
   };
 
   const addPortfolioPositionRejected: AddPortfolioPositionDto = {
     pair: 'ETH/USDT',
     dollarAmount: 1000000,
     direction: 'short',
-    dataSource: 'binance_future',
+    dataSource: 'binance_futures',
   };
 
   describe('Create a portfolio with max var of 100, max open trade of 1 on 1 min tf and add an accepted position when I add a rejected position ', () => {
@@ -209,7 +209,7 @@ describe('Portfolio Create a portfolio -> add allowed position -> change allowed
       pair: 'BTC/USDT',
       dollarAmount: 1000000,
       direction: 'long',
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     const updatePortfolioDto: UpdatePortfolioDto = {
@@ -220,7 +220,7 @@ describe('Portfolio Create a portfolio -> add allowed position -> change allowed
       pair: 'ETH/USDT',
       dollarAmount: 1,
       direction: 'long',
-      dataSource: 'binance_future',
+      dataSource: 'binance_futures',
     };
 
     it('should give status code 403 (forbidden) with message error "you cannot add this position because you will exceed max allowed var" ', async () => {
