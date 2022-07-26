@@ -23,6 +23,7 @@ import { Portfolio } from './models/portfolio';
 
 @Injectable()
 export class PortfolioService {
+  removePort: any;
   constructor(private prisma: PrismaService) {}
 
   async create(
@@ -50,14 +51,6 @@ export class PortfolioService {
   }
 
   update(portfolioId: number, updatePortfolioDto: UpdatePortfolioDto) {
-    // const portfolio = this.portfolios.find(
-    //   (portfolio) => portfolio.state.id == portfolioId,
-    // );
-
-    // if (portfolio === undefined)
-    //   throw new NotFoundException(
-    //     `The portfolio with id ${portfolioId} has not been found`,
-    //   );
     let updateData = {};
 
     if (updatePortfolioDto.maxVarInDollar)
@@ -111,26 +104,34 @@ export class PortfolioService {
     return prismaPortfolioToPortfolio(findPrismaPortfolio);
   }
 
-  delete(id: number) {
-    this.prisma.portfolio.delete({ where: { id: id } });
-    // this.portfolios = this.portfolios.filter(
-    //   (portfolio) => portfolio.state.id !== id,
-    // );
+  async delete(id: number) {
+    try {
+      await this.prisma.portfolio.delete({ where: { id: id } });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // The .code property can be accessed in a type-safe manner
+        if (e.code === 'P2016') {
+          throw new NotFoundException(
+            `Unable to delete portfolio with id ${id} : not found`,
+          );
+        }
+      }
+    }
   }
 
-  async removePortfolioPosition(portfolioId: number, positionId: number) {
-    this.prisma.position.delete({ where: { id: positionId } });
-
-    // const portfolio = this.portfolios.find(
-    //   (portfolio) => portfolio.state.id == portfolioId,
-    // );
-
-    // if (portfolio === undefined)
-    //   throw new NotFoundException(
-    //     `The portfolio with id ${portfolioId} has not been found`,
-    //   );
-
-    // return await portfolio.removePosition(positionId);
+  async removePortfolioPosition(id: number) {
+    try {
+      await this.prisma.position.delete({ where: { id: id } });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // The .code property can be accessed in a type-safe manner
+        if (e.code === 'P2016') {
+          throw new NotFoundException(
+            `Unable to delete portfolio position with id ${id} : not found`,
+          );
+        }
+      }
+    }
   }
 
   async addPortfolioPosition(
@@ -147,15 +148,6 @@ export class PortfolioService {
     });
 
     const portfolio = await prismaPortfolioToPortfolio(prismaPortfolio);
-
-    // const portfolio = this.portfolios.find(
-    //   (portfolio) => portfolio.state.id === id,
-    // );
-
-    // if (portfolio === undefined)
-    //   throw new NotFoundException(
-    //     `The portfolio with id ${id} has not been found`,
-    //   );
 
     const addPositionInfos = await portfolio.addPosition(addPortfolioPosition);
 

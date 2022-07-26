@@ -4,11 +4,11 @@ import {
 } from './portfolio';
 
 import {
-  positions,
   positionOpportunity,
   portfolioState,
   opportunityInfo,
   portfolioConstraints,
+  SupportedExchanges,
 } from '../interfaces/interfaces';
 
 jest.mock('../pure_functions/candles', () => {
@@ -40,7 +40,7 @@ describe('Given 1 have 1 long BTC position open in portfolio when i try to add n
             dollarAmount: 0,
             direction: 'long',
             id: 1,
-            dataSource: 'binance_futures',
+            dataSource: SupportedExchanges.BinanceFutures,
           },
         ],
         1,
@@ -63,7 +63,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
       pair: 'BTC/USDT',
       dollarAmount: 0,
       direction: 'long',
-      dataSource: 'binance_futures',
+      dataSource: SupportedExchanges.BinanceFutures,
     };
 
     const opportunityInfo: opportunityInfo = {
@@ -100,7 +100,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
       pair: 'ETH/USDT',
       dollarAmount: 0,
       direction: 'long',
-      dataSource: 'binance_futures',
+      dataSource: SupportedExchanges.BinanceFutures,
     };
 
     const opportunityInfo: opportunityInfo = {
@@ -137,7 +137,7 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
       pair: 'ETH/USDT',
       dollarAmount: 0,
       direction: 'long',
-      dataSource: 'binance_futures',
+      dataSource: SupportedExchanges.BinanceFutures,
     };
 
     const opportunityInfo: opportunityInfo = {
@@ -167,43 +167,3 @@ describe('Given i have a portfolio with max var allowed is 200  with 1 max open 
     ).toBe(true);
   });
 });
-
-// describe('add position to the portfolio', () => {
-//   it('should return an id and an array positions with new one', async () => {
-//     const positionOpportunity: positionOpportunity = {
-//       pair: 'BTC/USDT',
-//       dollarAmount: 100,
-//       direction: 'long',
-//       dataSource: 'binance_futures',
-//     };
-
-//     const oldPositions: positions = [
-//       {
-//         pair: 'BTC/USDT',
-//         dollarAmount: 100,
-//         direction: 'long',
-//         id: 1,
-//         dataSource: 'binance_futures',
-//       },
-//     ];
-
-//     const positions = addPosition(positionOpportunity, oldPositions);
-//     expect(positions.length).toBe(2);
-//   });
-// });
-
-// describe('remove position from portfolio with 1 position', () => {
-//   it('should return an empty array', async () => {
-//     const oldPositions: positions = [
-//       {
-//         pair: 'BTC/USDT',
-//         dollarAmount: 100,
-//         direction: 'long',
-//         id: 1,
-//         dataSource: 'binance_futures',
-//       },
-//     ];
-
-//     expect(removePosition(1, oldPositions).length).toBe(0);
-//   });
-// });

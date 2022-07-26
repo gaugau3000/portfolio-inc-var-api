@@ -9,10 +9,10 @@ import configuration from '../config/configuration';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 import { PrismaService } from '../prisma.service';
 import {
-  Prisma,
   Portfolio as PrismaPortfolio,
   Position as PrismaPosition,
 } from '@prisma/client';
+import { SupportedExchanges } from './interfaces/interfaces';
 
 describe('PortfolioController', () => {
   let prisma: PrismaService;
@@ -61,7 +61,7 @@ describe('PortfolioController', () => {
       pair: 'BTC/USDT',
       dollarAmount: 100,
       direction: 'long',
-      dataSource: 'binance_futures',
+      dataSource: SupportedExchanges.BinanceFutures,
     };
 
     describe('When I create a portfolio then', () => {
@@ -99,7 +99,7 @@ describe('PortfolioController', () => {
             pair: 'BTC/USDT',
             dollarAmount: 100,
             direction: 'long',
-            dataSource: 'binance_futures',
+            dataSource: SupportedExchanges.BinanceFutures,
             portfolioId: 1,
           });
           const portfolioId = (
@@ -127,7 +127,7 @@ describe('PortfolioController', () => {
             pair: 'BTC/USDT',
             dollarAmount: 100,
             direction: 'long',
-            dataSource: 'binance_futures',
+            dataSource: SupportedExchanges.BinanceFutures,
             portfolioId: 1,
           });
 
@@ -144,7 +144,6 @@ describe('PortfolioController', () => {
 
           expect(
             portfolioController.removePortfolioPosition(
-              portfolioId.toString(),
               positionResponse.id.toString(),
             ),
           ).toBeUndefined;
@@ -169,7 +168,7 @@ describe('PortfolioController', () => {
                 pair: 'BTC/USDT',
                 dollarAmount: 100,
                 direction: 'long',
-                dataSource: 'binance_futures',
+                dataSource: SupportedExchanges.BinanceFutures,
               },
             ],
           };

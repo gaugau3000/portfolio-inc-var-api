@@ -3,7 +3,6 @@ import {
   portfolioConstraints,
   portfolioState,
   portfolioParams,
-  position,
   positionOpportunity,
 } from '../interfaces/interfaces';
 import { CreatePortfolioDto } from '../dto/create-portfolio.dto';

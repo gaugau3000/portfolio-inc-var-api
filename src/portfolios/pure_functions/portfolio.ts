@@ -1,8 +1,6 @@
 import {
   direction,
   position,
-  positionOpportunity,
-  positions,
   portfolioState,
   portfolioConstraints,
 } from '../interfaces/interfaces';
@@ -56,27 +54,3 @@ export async function isAcceptedOpportunity(
 
   return true;
 }
-
-// export function addPosition(
-//   positionOpportunity: positionOpportunity,
-//   positions: Array<position>,
-// ): positions {
-//   const id = idv4();
-//   const position: position = {
-//     id: id,
-//     pair: positionOpportunity.pair,
-//     direction: positionOpportunity.direction,
-//     dollarAmount: positionOpportunity.dollarAmount,
-//     dataSource: 'binance_futures',
-//   };
-//   positions.push(position);
-//   return positions;
-// }
-
-// export function removePosition(
-//   id: string,
-//   positions: Array<position>,
-// ): Array<position> {
-//   positions = positions.filter((position) => position.id !== id);
-//   return positions;
-// }

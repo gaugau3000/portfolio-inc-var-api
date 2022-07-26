@@ -66,13 +66,11 @@ export class PortfolioController {
     );
   }
 
-  @Delete(':portfolioId/positions/:positionId')
-  removePortfolioPosition(
-    @Param('portfolioId') portfolioId: string,
+  @Delete('positions/:positionId')
+  async removePortfolioPosition(
     @Param('positionId') positionId: string,
   ): Promise<void> {
-    return this.portfolioService.removePortfolioPosition(
-      parseInt(portfolioId),
+    return await this.portfolioService.removePortfolioPosition(
       parseInt(positionId),
     );
   }

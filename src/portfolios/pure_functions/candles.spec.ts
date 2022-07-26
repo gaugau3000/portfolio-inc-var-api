@@ -1,6 +1,7 @@
 import { getAssetLastCloses } from './candles';
 import * as testData from './test.data.json';
 import { AppConfig } from '../models/app-config';
+import { SupportedExchanges } from '../interfaces/interfaces';
 jest.mock('ccxt', () => {
   return {
     binance: jest.fn().mockImplementation(() => {
@@ -21,7 +22,7 @@ describe('Fetch the last n closes candle for binance futures on 1h timeframe for
       'BTC/USDT',
       20,
       '1h',
-      'binance_futures',
+      SupportedExchanges.BinanceFutures,
     );
     expect(btcCloses.length).toBe(20);
     expect(btcCloses[btcCloses.length - 1]).toBe(39748.6);

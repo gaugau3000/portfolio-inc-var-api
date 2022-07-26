@@ -1,4 +1,4 @@
-import { dataSource, direction } from '../interfaces/interfaces';
+import { direction, SupportedExchanges } from '../interfaces/interfaces';
 import { IsNumber, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -29,8 +29,8 @@ export class AddPortfolioPositionDto {
   @ApiProperty({
     description: 'the data source used to get the candles and compute the var',
     example: 'binance_futures',
-    enum: ['binance_futures'],
+    enum: ['binance_futures', 'binance_spot'],
   })
   @IsString()
-  dataSource: dataSource;
+  dataSource: SupportedExchanges;
 }

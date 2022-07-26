@@ -2,16 +2,16 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ccxt = require('ccxt');
 
-import { dataSource } from '../interfaces/interfaces';
 import { AppConfig } from '../models/app-config';
+import { SupportedExchanges } from '../interfaces/interfaces';
 
 export async function getAssetLastCloses(
   pair: string,
   nbComputePeriods: number,
   timeframe: string,
-  dataSource: dataSource,
+  exchangeDataSource: SupportedExchanges,
 ) {
-  const ccxtExtra = {
+  const ccxtBinanceExtra = {
     enableRateLimit: false,
     urls: {
       api: {
@@ -20,20 +20,31 @@ export async function getAssetLastCloses(
             'ccxtExtraConfig.binanceFutureUrlOverwrite',
           ),
         }),
+        ...(AppConfig.get('ccxtExtraConfig.binanceSpotUrlOverwrite') && {
+          fapiPublic: AppConfig.get('ccxtExtraConfig.binanceSpotUrlOverwrite'),
+        }),
       },
     },
   };
 
-  const binanceFuture = new ccxt.binance({
-    ...ccxtExtra,
+  const binanceFutures = new ccxt.binance({
+    ...ccxtBinanceExtra,
     options: {
       defaultType: 'future',
     },
   });
+
+  const binanceSpot = new ccxt.binance({
+    ...ccxtBinanceExtra,
+  });
   let ohlc;
-  if (dataSource === 'binance_futures')
-    ohlc = await binanceFuture.fetchOHLCV(pair, timeframe);
-  else throw new Error(`${dataSource} is not implemented has data source`);
+
+  if (exchangeDataSource === SupportedExchanges.BinanceFutures)
+    ohlc = await binanceFutures.fetchOHLCV(pair, timeframe);
+  else if (exchangeDataSource === SupportedExchanges.BinanceSpot)
+    ohlc = await binanceSpot.fetchOHLCV(pair, timeframe);
+  else
+    throw new Error(`${exchangeDataSource} is not implemented has data source`);
 
   ohlc = ohlc.map((candle) => candle[4]).slice(-nbComputePeriods - 1);
   ohlc.pop();

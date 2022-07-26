@@ -13,7 +13,8 @@ To calculate the value at risk you need to get the last n candles of the asset. 
 
 | Data Source  | Status          | 
 | --------------- |--------------- |
-| Binance Future  | :white_check_mark: |
+| Binance Futures  | :white_check_mark: |
+| Binance Spot  | :white_check_mark: |
 
 
 ## Running the app with docker

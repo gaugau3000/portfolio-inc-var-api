@@ -3,7 +3,7 @@ import {
   getPortfolioStd,
   computeVar,
 } from './value-at-risk';
-import { position } from '../interfaces/interfaces';
+import { position, SupportedExchanges } from '../interfaces/interfaces';
 
 jest.mock('./candles', () => {
   return {
@@ -52,14 +52,14 @@ describe('A portfolio with BTC and ETH ', () => {
       dollarAmount: 1000,
       direction: 'long',
       id: 1,
-      dataSource: 'binance_futures',
+      dataSource: SupportedExchanges.BinanceFutures,
     };
     const ethPosition: position = {
       pair: 'ETH/USDT',
       dollarAmount: 1000,
       direction: 'long',
       id: 2,
-      dataSource: 'binance_futures',
+      dataSource: SupportedExchanges.BinanceFutures,
     };
 
     expect(await computeVar(1.65, [btcPosition, ethPosition], 20, '1h')).toBe(

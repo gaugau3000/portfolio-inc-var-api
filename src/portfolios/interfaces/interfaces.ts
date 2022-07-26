@@ -9,7 +9,7 @@ export interface positionOpportunity {
   pair: string;
   dollarAmount: number;
   direction: direction;
-  dataSource: dataSource;
+  dataSource: SupportedExchanges;
 }
 
 export interface position extends positionOpportunity {
@@ -38,8 +38,6 @@ export interface addPositionResponse {
   id?: number;
   reason?: string;
 }
-
-export type dataSource = 'binance_futures';
 
 export type opportunityInfo = {
   opportunity: {
