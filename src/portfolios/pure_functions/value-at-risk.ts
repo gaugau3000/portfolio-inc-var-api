@@ -16,20 +16,22 @@ export async function computeVar(
   nbComputePeriods: number,
   timeframe: string,
 ): Promise<number> {
-  const positionsLastCloses: number[][] = [];
+  let positionsLastCloses: number[][] = [];
 
-  await Promise.all(
-    positions.map(async (position) => {
-      positionsLastCloses.push(
-        await getAssetLastCloses(
-          position.pair,
-          nbComputePeriods,
-          timeframe,
-          position.dataSource,
-        ),
-      );
-    }),
-  );
+  const assetLastClosesPromises = [];
+
+  positions.forEach((position) => {
+    assetLastClosesPromises.push(
+      getAssetLastCloses(
+        position.pair,
+        nbComputePeriods,
+        timeframe,
+        position.dataSource,
+      ),
+    );
+  });
+
+  positionsLastCloses = await Promise.all(assetLastClosesPromises);
 
   const positionsStd = [];
   positionsLastCloses.forEach((positionLastCloses) => {
