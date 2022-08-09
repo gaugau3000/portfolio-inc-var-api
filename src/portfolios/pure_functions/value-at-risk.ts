@@ -40,15 +40,23 @@ export async function computeVar(
     positionsStd.push(math.std(pctChange(positionLastCloses)));
   });
 
+  console.log({ positionsStd });
+
   const weights: number[] = computeWeights(positions);
+
+  console.log({ weights });
+
+  const positionsMatrix: number[][] = getPositionsCorrMatrix(
+    positionsLastCloses,
+    positions.map((position) => position.direction),
+  );
+
+  console.log({ positionsMatrix });
 
   const portfolioStd: number = getPortfolioStd(
     weights,
     positionsStd,
-    getPositionsCorrMatrix(
-      positionsLastCloses,
-      positions.map((position) => position.direction),
-    ),
+    positionsMatrix,
   );
 
   const totalInvestedAmount: number = sumInvestedAmount(positions);
