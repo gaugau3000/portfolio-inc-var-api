@@ -122,11 +122,16 @@ export function getPortfolioStd(
     positionsWeights,
     positionsStd,
   );
+
+  console.log({ weightsStdMember });
   const weightsStdCorrMember = computeWeightsStdCorrMember(
     positionsWeights,
     positionsStd,
     positionsCorrMatrix,
   );
+
+  console.log({ weightsStdCorrMember });
+
   portfolioStdSquare = weightsStdMember + weightsStdCorrMember;
 
   return Math.sqrt(portfolioStdSquare);
