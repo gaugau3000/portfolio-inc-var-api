@@ -33,25 +33,17 @@ export async function computeVar(
 
   positionsLastCloses = await Promise.all(assetLastClosesPromises);
 
-  console.log({ positionsLastCloses });
-
   const positionsStd = [];
   positionsLastCloses.forEach((positionLastCloses) => {
     positionsStd.push(math.std(pctChange(positionLastCloses)));
   });
 
-  console.log({ positionsStd });
-
   const weights: number[] = computeWeights(positions);
-
-  console.log({ weights });
 
   const positionsMatrix: number[][] = getPositionsCorrMatrix(
     positionsLastCloses,
     positions.map((position) => position.direction),
   );
-
-  console.log({ positionsMatrix });
 
   const portfolioStd: number = getPortfolioStd(
     weights,
@@ -60,8 +52,6 @@ export async function computeVar(
   );
 
   const totalInvestedAmount: number = sumInvestedAmount(positions);
-
-  console.log({ zscore, portfolioStd, totalInvestedAmount });
 
   const valueAtRisk = zscore * portfolioStd * totalInvestedAmount;
 
@@ -123,14 +113,11 @@ export function getPortfolioStd(
     positionsStd,
   );
 
-  console.log({ weightsStdMember });
   const weightsStdCorrMember = computeWeightsStdCorrMember(
     positionsWeights,
     positionsStd,
     positionsCorrMatrix,
   );
-
-  console.log({ weightsStdCorrMember });
 
   portfolioStdSquare = weightsStdMember + weightsStdCorrMember;
 
@@ -157,7 +144,7 @@ function computeWeightsStdCorrMember(
     });
   });
 
-  return weightsStdCorrMember;
+  return Math.abs(weightsStdCorrMember);
 }
 
 function computeWeightsStdMember(
