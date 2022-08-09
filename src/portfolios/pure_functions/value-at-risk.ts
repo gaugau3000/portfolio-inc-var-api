@@ -33,6 +33,8 @@ export async function computeVar(
 
   positionsLastCloses = await Promise.all(assetLastClosesPromises);
 
+  console.log({ positionsLastCloses });
+
   const positionsStd = [];
   positionsLastCloses.forEach((positionLastCloses) => {
     positionsStd.push(math.std(pctChange(positionLastCloses)));
@@ -50,6 +52,8 @@ export async function computeVar(
   );
 
   const totalInvestedAmount: number = sumInvestedAmount(positions);
+
+  console.log({ zscore, portfolioStd, totalInvestedAmount });
 
   const valueAtRisk = zscore * portfolioStd * totalInvestedAmount;
 
