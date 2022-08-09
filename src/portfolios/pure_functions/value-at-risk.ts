@@ -121,7 +121,7 @@ export function getPortfolioStd(
 
   portfolioStdSquare = weightsStdMember + weightsStdCorrMember;
 
-  return Math.sqrt(Math.abs(portfolioStdSquare));
+  return Math.sqrt(portfolioStdSquare);
 }
 
 function computeWeightsStdCorrMember(
@@ -144,7 +144,7 @@ function computeWeightsStdCorrMember(
     });
   });
 
-  return weightsStdCorrMember;
+  return Math.abs(weightsStdCorrMember);
 }
 
 function computeWeightsStdMember(
