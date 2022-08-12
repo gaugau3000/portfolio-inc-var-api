@@ -6,20 +6,43 @@ import {
 } from '../interfaces/interfaces';
 import { opportunityInfo } from '../interfaces/interfaces';
 
+// export function isBelowMaxOpenTradeSameSymbolSameDirection(
+//   positionOpportunityPair: string,
+//   positionOpportunityDirection: direction,
+//   openPositions: Array<position>,
+//   maxOpenTradeSameSymbolSameDirection: number,
+// ): boolean {
+//   let nbOpenTradeCurrentSymbolSameDirection =
+//     positionOpportunityDirection === 'long' ? 1 : -1;
+
+//   openPositions.forEach((position) => {
+//     if (position.pair == positionOpportunityPair) {
+//       if (position.direction == 'long') nbOpenTradeCurrentSymbolSameDirection++;
+//       if (position.direction == 'short')
+//         nbOpenTradeCurrentSymbolSameDirection--;
+//     }
+//   });
+
+//   if (
+//     nbOpenTradeCurrentSymbolSameDirection <= maxOpenTradeSameSymbolSameDirection
+//   )
+//     return true;
+//   return false;
+// }
+
 export function isBelowMaxOpenTradeSameSymbolSameDirection(
   positionOpportunityPair: string,
   positionOpportunityDirection: direction,
   openPositions: Array<position>,
   maxOpenTradeSameSymbolSameDirection: number,
 ): boolean {
-  let nbOpenTradeCurrentSymbolSameDirection =
-    positionOpportunityDirection === 'long' ? 1 : -1;
+  let nbOpenTradeCurrentSymbolSameDirection = 1;
 
   openPositions.forEach((position) => {
     if (position.pair == positionOpportunityPair) {
       if (position.direction == 'long') nbOpenTradeCurrentSymbolSameDirection++;
       if (position.direction == 'short')
-        nbOpenTradeCurrentSymbolSameDirection--;
+        nbOpenTradeCurrentSymbolSameDirection++;
     }
   });
 
