@@ -10,6 +10,7 @@ export interface positionOpportunity {
   dollarAmount: number;
   direction: direction;
   dataSource: SupportedExchanges;
+  strategy?: string;
 }
 
 export interface position extends positionOpportunity {

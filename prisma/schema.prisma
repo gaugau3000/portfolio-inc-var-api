@@ -24,6 +24,7 @@ model Position {
   dollarAmount Float
   direction    String
   dataSource   String
-  portfolioId  Int?
-  Portfolio    Portfolio? @relation(fields: [portfolioId], references: [id])
+  portfolioId  Int
+  strategy     String?
+  Portfolio    Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 }

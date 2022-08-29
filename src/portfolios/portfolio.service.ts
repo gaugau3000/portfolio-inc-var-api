@@ -14,6 +14,7 @@ import {
   Prisma,
   Portfolio as PrismaPortfolio,
   Position as PrismaPosition,
+  Position,
 } from '@prisma/client';
 import {
   portfolioDtoToPrismaPortfolioCreateInput,
@@ -165,6 +166,9 @@ export class PortfolioService {
       dollarAmount: addPortfolioPosition.dollarAmount,
       direction: addPortfolioPosition.direction,
       dataSource: addPortfolioPosition.dataSource,
+      ...(addPortfolioPosition.strategy && {
+        strategy: addPortfolioPosition.strategy,
+      }),
       Portfolio: {
         connect: { id: id },
       },
@@ -177,5 +181,28 @@ export class PortfolioService {
     delete addPositionInfos.reason;
     addPositionInfos['id'] = prismaPosition.id;
     return addPositionInfos;
+  }
+
+  async findPortfolioPositionsByStrategy(
+    portfolioId: number,
+    strategy: string,
+  ): Promise<Position[]> {
+    try {
+      return await this.prisma.position.findMany({
+        where: {
+          portfolioId: portfolioId,
+          strategy: strategy,
+        },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        // The .code property can be accessed in a type-safe manner
+        if (e.code === 'P2016') {
+          throw new NotFoundException(
+            `Unable to find portfolio with id ${portfolioId} : not found`,
+          );
+        }
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { direction, SupportedExchanges } from '../interfaces/interfaces';
-import { IsNumber, IsString, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AddPortfolioPositionDto {
@@ -33,4 +33,12 @@ export class AddPortfolioPositionDto {
   })
   @IsString()
   dataSource: SupportedExchanges;
+
+  @ApiProperty({
+    description: 'the name of the strategy link to position',
+    example: 'MaCrossOver',
+  })
+  @IsString()
+  @IsOptional()
+  strategy?: string;
 }

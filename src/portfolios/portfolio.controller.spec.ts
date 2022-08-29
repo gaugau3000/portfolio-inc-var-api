@@ -62,6 +62,7 @@ describe('PortfolioController', () => {
       dollarAmount: 100,
       direction: 'long',
       dataSource: SupportedExchanges.BinanceFutures,
+      strategy: 'MaCrossOver',
     };
 
     describe('When I create a portfolio then', () => {
@@ -129,6 +130,7 @@ describe('PortfolioController', () => {
             direction: 'long',
             dataSource: SupportedExchanges.BinanceFutures,
             portfolioId: 1,
+            strategy: 'MaCrossOver',
           });
 
           prisma.position.delete = jest.fn().mockReturnValue(undefined);
@@ -169,6 +171,7 @@ describe('PortfolioController', () => {
                 dollarAmount: 100,
                 direction: 'long',
                 dataSource: SupportedExchanges.BinanceFutures,
+                strategy: 'MaCrossOver',
               },
             ],
           };

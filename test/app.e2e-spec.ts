@@ -81,6 +81,7 @@ describe('Test e2e portfolio', () => {
       dollarAmount: 100,
       direction: 'long',
       dataSource: SupportedExchanges.BinanceFutures,
+      strategy: 'MaCrossOver',
     };
 
     describe('When I create a portfolio with max var of 100, max open trade of 1 on 1 min tf then', () => {
@@ -159,6 +160,7 @@ describe('Test e2e portfolio', () => {
       dollarAmount: 100,
       direction: 'short',
       dataSource: SupportedExchanges.BinanceFutures,
+      strategy: 'MaCrossOver',
     };
 
     const addPortfolioPositionRejected: AddPortfolioPositionDto = {
@@ -166,6 +168,7 @@ describe('Test e2e portfolio', () => {
       dollarAmount: 1000000,
       direction: 'short',
       dataSource: SupportedExchanges.BinanceFutures,
+      strategy: 'MaCrossOver',
     };
 
     describe('Create a portfolio with max var of 100, max open trade of 1 on 1 min tf and add an accepted position when I add a rejected position ', () => {
@@ -217,6 +220,7 @@ describe('Test e2e portfolio', () => {
         dollarAmount: 1000000,
         direction: 'long',
         dataSource: SupportedExchanges.BinanceFutures,
+        strategy: 'MaCrossOver',
       };
 
       const updatePortfolioDto: UpdatePortfolioDto = {
@@ -228,6 +232,7 @@ describe('Test e2e portfolio', () => {
         dollarAmount: 1,
         direction: 'long',
         dataSource: SupportedExchanges.BinanceFutures,
+        strategy: 'MaCrossOver',
       };
 
       it('should give status code 403 (forbidden) with message error "you cannot add this position because you will exceed max allowed var" ', async () => {
@@ -259,6 +264,57 @@ describe('Test e2e portfolio', () => {
         expect(error).toBe(
           'you cannot add this position because you will exceed max allowed var',
         );
+      });
+    });
+  });
+
+  describe('Portfolio Create a portfolio -> add allowed position -> get positions using portfolio name ', () => {
+    beforeEach(async () => {
+      await initApp();
+    });
+
+    describe('Create a valid portfolio, add a valid position and get positions using portfolio name', () => {
+      let portfolioId = '';
+
+      const createPortfolioDto: CreatePortfolioDto = {
+        params: {
+          nbComputePeriods: 20,
+          zscore: 1.65,
+          timeframe: '1m',
+          nameId: 'crypto_15m',
+        },
+        constraints: {
+          maxVarInDollar: 100000,
+          maxOpenTradeSameSymbolSameDirection: 1,
+        },
+      };
+
+      const addPortfolioPositionAccepted: AddPortfolioPositionDto = {
+        pair: 'BTC/USDT',
+        dollarAmount: 1000000,
+        direction: 'long',
+        dataSource: SupportedExchanges.BinanceFutures,
+        strategy: 'MaCrossOver',
+      };
+
+      it('should return 200 status code and first element of array for property should be MaCrossOver', async () => {
+        await request(app.getHttpServer())
+          .post('/portfolios')
+          .send(createPortfolioDto)
+          .expect((res) => {
+            portfolioId = res.body.id;
+          });
+
+        await request(app.getHttpServer())
+          .post(`/portfolios/${portfolioId}/positions`)
+          .send(addPortfolioPositionAccepted);
+
+        const portfolioPositions = await request(app.getHttpServer())
+          .get(`/portfolios/${portfolioId}/positions/findByStrategy`)
+          .query({ strategy: 'MaCrossOver' })
+          .expect(200);
+        console.log(portfolioPositions.body);
+        expect(portfolioPositions.body[0].strategy).toBe('MaCrossOver');
       });
     });
   });

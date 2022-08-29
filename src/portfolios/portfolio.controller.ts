@@ -17,6 +17,7 @@ import { createPortfolioResponse } from './responses/create-portfolio-response';
 import { Portfolio } from './models/portfolio';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
 import { addPositionResponse } from './interfaces/interfaces';
+import { Position } from '@prisma/client';
 
 @Controller('portfolios')
 export class PortfolioController {
@@ -63,6 +64,18 @@ export class PortfolioController {
     return await this.portfolioService.addPortfolioPosition(
       parseInt(id),
       addPortfolioPosition,
+    );
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id/positions/findByStrategy')
+  async findPortfolioPositionsByStrategy(
+    @Param('id') id: string,
+    @Query('strategy') strategy: string,
+  ): Promise<Position[]> {
+    return await this.portfolioService.findPortfolioPositionsByStrategy(
+      parseInt(id),
+      strategy,
     );
   }
 
