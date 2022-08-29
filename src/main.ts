@@ -5,9 +5,7 @@ import * as fs from 'fs';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn'],
-  });
+  const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ enableDebugMessages: true }));
 
   const config = new DocumentBuilder()
