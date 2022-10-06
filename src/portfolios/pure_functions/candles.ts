@@ -5,12 +5,10 @@ const ccxt = require('ccxt');
 import { AppConfig } from '../models/app-config';
 import { SupportedExchanges } from '../interfaces/interfaces';
 
-export async function getAssetLastCloses(
-  pair: string,
-  nbComputePeriods: number,
-  timeframe: string,
-  exchangeDataSource: SupportedExchanges,
-) {
+let binanceFutures;
+let binanceSpot;
+
+export async function getMarket(exchangeDataSource: SupportedExchanges) {
   const ccxtBinanceExtra = {
     enableRateLimit: false,
     urls: {
@@ -27,24 +25,34 @@ export async function getAssetLastCloses(
     },
   };
 
-  const binanceFutures = new ccxt.binance({
-    ...ccxtBinanceExtra,
-    options: {
-      defaultType: 'future',
-    },
-  });
-
-  const binanceSpot = new ccxt.binance({
-    ...ccxtBinanceExtra,
-  });
-  let ohlc;
-
-  if (exchangeDataSource === SupportedExchanges.BinanceFutures)
-    ohlc = await binanceFutures.fetchOHLCV(pair, timeframe);
-  else if (exchangeDataSource === SupportedExchanges.BinanceSpot)
-    ohlc = await binanceSpot.fetchOHLCV(pair, timeframe);
-  else
+  if (exchangeDataSource === SupportedExchanges.BinanceFutures) {
+    if (binanceFutures !== null && binanceFutures !== undefined)
+      return binanceFutures;
+    binanceFutures = new ccxt.binance({
+      ...ccxtBinanceExtra,
+      options: {
+        defaultType: 'future',
+      },
+    });
+    return binanceFutures;
+  } else if (exchangeDataSource === SupportedExchanges.BinanceSpot) {
+    if (binanceSpot !== null && binanceSpot !== undefined) return binanceSpot;
+    binanceSpot = new ccxt.binance({
+      ...ccxtBinanceExtra,
+    });
+    return binanceSpot;
+  } else
     throw new Error(`${exchangeDataSource} is not implemented has data source`);
+}
+
+export async function getAssetLastCloses(
+  pair: string,
+  nbComputePeriods: number,
+  timeframe: string,
+  exchangeDataSource: SupportedExchanges,
+) {
+  const market = await getMarket(exchangeDataSource);
+  let ohlc = await market.fetchOHLCV(pair, timeframe);
 
   ohlc = ohlc.map((candle) => candle[4]).slice(-nbComputePeriods - 1);
   ohlc.pop();
