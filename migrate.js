@@ -2,7 +2,8 @@
 
 'use strict';
 
-import { execSync } from 'child_process';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { execSync } = require('child_process');
 const { DATABASE_URL_MIGRATE } = process.env;
 
 try {
