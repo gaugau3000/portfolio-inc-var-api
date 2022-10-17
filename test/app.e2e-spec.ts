@@ -313,7 +313,6 @@ describe('Test e2e portfolio', () => {
           .get(`/portfolios/${portfolioId}/positions/findByStrategy`)
           .query({ strategy: 'MaCrossOver' })
           .expect(200);
-        console.log(portfolioPositions.body);
         expect(portfolioPositions.body[0].strategy).toBe('MaCrossOver');
       });
     });
