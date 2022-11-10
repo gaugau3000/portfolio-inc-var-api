@@ -54,8 +54,7 @@ export async function getAssetLastCloses(
   const market = await getMarket(exchangeDataSource);
   let ohlc = await market.fetchOHLCV(pair, timeframe);
 
-  ohlc = ohlc.map((candle) => candle[4]).slice(-nbComputePeriods - 1);
-  ohlc.pop();
+  ohlc = ohlc.map((candle) => candle[4]).slice(-nbComputePeriods);
 
   return ohlc;
 }
