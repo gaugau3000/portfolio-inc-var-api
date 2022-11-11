@@ -51,7 +51,7 @@ export class PortfolioService {
     }
   }
 
-  update(portfolioId: number, updatePortfolioDto: UpdatePortfolioDto) {
+  async update(portfolioId: number, updatePortfolioDto: UpdatePortfolioDto) {
     let updateData = {};
 
     if (updatePortfolioDto.maxVarInDollar)
@@ -63,7 +63,7 @@ export class PortfolioService {
           updatePortfolioDto.maxOpenTradeSameSymbolSameDirection,
       };
 
-    return this.prisma.portfolio.update({
+    return await this.prisma.portfolio.update({
       data: updateData,
       where: { id: portfolioId },
     });
