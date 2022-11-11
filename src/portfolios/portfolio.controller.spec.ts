@@ -13,6 +13,7 @@ import {
   Position as PrismaPosition,
 } from '@prisma/client';
 import { SupportedExchanges } from './interfaces/interfaces';
+import { createPortfolioResponse } from './responses/create-portfolio-response';
 
 describe('PortfolioController', () => {
   let prisma: PrismaService;
@@ -65,22 +66,24 @@ describe('PortfolioController', () => {
       strategy: 'MaCrossOver',
     };
 
-    describe('When I create a portfolio then', () => {
-      it('should return an object with id=1', async () => {
+    describe('When I create a portfolio then then', () => {
+      it('should return response with id=1', async () => {
         prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
-        const portfolioId = (
-          await portfolioController.create(portfolioAttributes)
-        ).id;
-        expect(portfolioId).toBe(1);
+
+        const portfolio: createPortfolioResponse =
+          await portfolioController.create(portfolioAttributes);
+
+        expect(portfolio.id).toBe(1);
       });
     });
 
     describe('When I create a portfolio and i get all portfolios then', () => {
-      it('should return an array of portfolio with length 1 and id of the portfolio should be the same with the one get', async () => {
+      it('should return a list with 1 portfolio and id should be 1', async () => {
         prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
         prisma.portfolio.findMany = jest
           .fn()
           .mockReturnValue([{ ...prismaPortfolio, positions: [] }]);
+
         const portfolioId = (
           await portfolioController.create(portfolioAttributes)
         ).id;
@@ -90,7 +93,7 @@ describe('PortfolioController', () => {
       });
 
       describe('Given a portfolio when i had an allowed position then', () => {
-        it('should return an accepted status and id=1', async () => {
+        it('should return an accepted status and id should be 1', async () => {
           prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
           prisma.portfolio.findUnique = jest
             .fn()
@@ -103,6 +106,7 @@ describe('PortfolioController', () => {
             dataSource: SupportedExchanges.BinanceFutures,
             portfolioId: 1,
           });
+
           const portfolioId = (
             await portfolioController.create(portfolioAttributes)
           ).id;
@@ -155,6 +159,7 @@ describe('PortfolioController', () => {
       describe('Given I create a portfolio with id=1 when i find it using nameId then', () => {
         it('should return the portfolio with id=1', async () => {
           prisma.portfolio.create = jest.fn().mockReturnValue(prismaPortfolio);
+
           const portfolioId = (
             await portfolioController.create(portfolioAttributes)
           ).id;
