@@ -2,6 +2,7 @@
 # Rest Api risk management trading tool based on incremental value at risk
 
 [![codecov](https://codecov.io/gh/gaugau3000/portfolio-inc-var-api/branch/master/graph/badge.svg?token=HEYV9B8Z0B)](https://codecov.io/gh/gaugau3000/portfolio-inc-var-api)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/629e122459e04f898e81a71679cd804c)](https://www.codacy.com/gh/gaugau3000/portfolio-inc-var-api/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gaugau3000/portfolio-inc-var-api&amp;utm_campaign=Badge_Grade)
 
 ## Description
 
