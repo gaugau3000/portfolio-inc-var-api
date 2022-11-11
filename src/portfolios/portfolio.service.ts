@@ -24,7 +24,6 @@ import { Portfolio } from './models/portfolio';
 
 @Injectable()
 export class PortfolioService {
-  removePort: any;
   constructor(private prisma: PrismaService) { }
 
   async create(
@@ -41,13 +40,13 @@ export class PortfolioService {
       return { id: prismaPortfolio.id };
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // The .code property can be accessed in a type-safe manner
         if (e.code === 'P2002') {
           throw new ConflictException(
             `A portfolio with this name already exist, please find another one`,
           );
         }
       }
+      throw e;
     }
   }
 
@@ -55,13 +54,13 @@ export class PortfolioService {
     portfolioId: number,
     updatePortfolioDto: UpdatePortfolioDto,
   ): Promise<Portfolio> {
-    let updateData = {};
+    let fieldsToUpdate = {};
 
     if (updatePortfolioDto.maxVarInDollar)
-      updateData = { maxVarInDollar: updatePortfolioDto.maxVarInDollar };
+      fieldsToUpdate = { maxVarInDollar: updatePortfolioDto.maxVarInDollar };
     if (updatePortfolioDto.maxOpenTradeSameSymbolSameDirection)
-      updateData = {
-        ...updateData,
+      fieldsToUpdate = {
+        ...fieldsToUpdate,
         maxOpenTradeSameSymbolSameDirection:
           updatePortfolioDto.maxOpenTradeSameSymbolSameDirection,
       };
@@ -69,7 +68,7 @@ export class PortfolioService {
     const updatedPortfolio: PrismaPortfolio & {
       positions: PrismaPosition[];
     } = await this.prisma.portfolio.update({
-      data: updateData,
+      data: fieldsToUpdate,
       where: { id: portfolioId },
       include: {
         positions: true,
@@ -90,7 +89,7 @@ export class PortfolioService {
 
     const portfolios = await Promise.all(
       prismaPortfolios.map(async (prismaPortfolio) => {
-        return prismaPortfolioToPortfolio(prismaPortfolio);
+        return await prismaPortfolioToPortfolio(prismaPortfolio);
       }),
     );
 
@@ -98,16 +97,27 @@ export class PortfolioService {
   }
 
   async findByNameId(portfolioNameId: string): Promise<Portfolio> {
-    const findPrismaPortfolio: PrismaPortfolio & {
-      positions: PrismaPosition[];
-    } = await this.prisma.portfolio.findUnique({
-      where: { nameId: portfolioNameId },
-      include: {
-        positions: true,
-      },
-    });
+    try {
+      const findPrismaPortfolio: PrismaPortfolio & {
+        positions: PrismaPosition[];
+      } = await this.prisma.portfolio.findUnique({
+        where: { nameId: portfolioNameId },
+        include: {
+          positions: true,
+        },
+      });
 
-    return await prismaPortfolioToPortfolio(findPrismaPortfolio);
+      return await prismaPortfolioToPortfolio(findPrismaPortfolio);
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2016') {
+          throw new NotFoundException(
+            `Unable to delete portfolio with nameId ${portfolioNameId} : not found`,
+          );
+        }
+      }
+      throw e;
+    }
   }
 
   async delete(id: number) {
@@ -115,13 +125,13 @@ export class PortfolioService {
       await this.prisma.portfolio.delete({ where: { id: id } });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // The .code property can be accessed in a type-safe manner
         if (e.code === 'P2016') {
           throw new NotFoundException(
             `Unable to delete portfolio with id ${id} : not found`,
           );
         }
       }
+      throw e;
     }
   }
 
@@ -130,13 +140,13 @@ export class PortfolioService {
       await this.prisma.position.delete({ where: { id: id } });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // The .code property can be accessed in a type-safe manner
         if (e.code === 'P2016') {
           throw new NotFoundException(
             `Unable to delete portfolio position with id ${id} : not found`,
           );
         }
       }
+      throw e;
     }
   }
 
@@ -201,13 +211,13 @@ export class PortfolioService {
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        // The .code property can be accessed in a type-safe manner
         if (e.code === 'P2016') {
           throw new NotFoundException(
             `Unable to find portfolio with id ${portfolioId} : not found`,
           );
         }
       }
+      throw e;
     }
   }
 }

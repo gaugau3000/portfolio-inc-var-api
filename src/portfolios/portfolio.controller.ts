@@ -30,8 +30,8 @@ export class PortfolioController {
     return await this.portfolioService.create(createPortfolioDto);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   async findAll(): Promise<Portfolio[]> {
     return await this.portfolioService.findAll();
   }
@@ -47,12 +47,12 @@ export class PortfolioController {
   async update(
     @Param('id') id: string,
     @Body() updatePortfolioDto: UpdatePortfolioDto,
-  ) {
+  ): Promise<Portfolio> {
     return await this.portfolioService.update(parseInt(id), updatePortfolioDto);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') id: string): Promise<void> {
     return await this.portfolioService.delete(parseInt(id));
   }
 
@@ -67,8 +67,8 @@ export class PortfolioController {
     );
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id/positions/findByStrategy')
+  @UseInterceptors(ClassSerializerInterceptor)
   async findPortfolioPositionsByStrategy(
     @Param('id') id: string,
     @Query('strategy') strategy: string,
