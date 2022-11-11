@@ -9,7 +9,8 @@ Once you have define a portfolio with a time-frame horizon, you will be able to 
 
 The project is built using Typescript and use nestjs framework.
 
-https://raw.githubusercontent.com/gaugau3000/portfolio-inc-var-api/master/docs/medias/demo_api_var.mp4
+https://user-images.githubusercontent.com/2643583/201255675-27241c3d-b1f7-4f42-909f-d01a01d80eb2.mp4
+
 
 ## DataProvider
 
@@ -83,7 +84,7 @@ $ npm run test:cov
 
 Please find swagger doc [here](https://gaugau3000.github.io/portfolio-inc-var-api/)
 
-## What't next ?
+## What's next ?
 
 Please go to [project page](https://github.com/gaugau3000/portfolio-inc-var-api/projects)
 
