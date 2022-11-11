@@ -25,7 +25,7 @@ import { Portfolio } from './models/portfolio';
 @Injectable()
 export class PortfolioService {
   removePort: any;
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(
     createPortfolioDto: CreatePortfolioDto,
@@ -96,11 +96,6 @@ export class PortfolioService {
         positions: true,
       },
     });
-
-    // if (findedPortfolio === undefined)
-    //   throw new NotFoundException(
-    //     `The portfolio with nameId ${portfolioNameId} has not been found`,
-    //   );
 
     return prismaPortfolioToPortfolio(findPrismaPortfolio);
   }
