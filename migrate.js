@@ -4,7 +4,8 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { execSync } = require('child_process');
-const { DATABASE_URL_MIGRATE } = process.env;
+const DATABASE_URL_MIGRATE =
+  process.env.DATABASE_URL_MIGRATE || process.env.DATABASE_URL;
 
 try {
   // Run the migrate with database connection not using pooling
