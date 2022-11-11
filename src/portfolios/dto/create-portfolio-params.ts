@@ -3,13 +3,6 @@ import { IsDefined, IsInt, IsNumber, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePortfolioParams {
-  constructor(params: portfolioParams) {
-    this.nameId = params.nameId;
-    this.nbComputePeriods = params.nbComputePeriods;
-    this.timeframe = params.timeframe;
-    this.zscore = params.zscore;
-  }
-
   @ApiProperty({
     description:
       'The number of periods to compute the correlation and standard deviation of the portfolio var',

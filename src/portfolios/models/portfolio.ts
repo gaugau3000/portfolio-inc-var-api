@@ -3,10 +3,8 @@ import {
   portfolioConstraints,
   portfolioState,
   portfolioParams,
-  position,
   positionOpportunity,
 } from '../interfaces/interfaces';
-import { uuid } from 'uuidv4';
 import { CreatePortfolioDto } from '../dto/create-portfolio.dto';
 import {
   isBelowMaxOpenTradeSameSymbolSameDirection,
@@ -26,10 +24,23 @@ export class Portfolio {
 
   state: portfolioState;
 
-  constructor(obj: CreatePortfolioDto) {
+  constructor(
+    obj: CreatePortfolioDto & {
+      state: portfolioState;
+    },
+  ) {
     this.params = obj.params;
     this.constraints = obj.constraints;
-    this.state = { positions: [], uuid: uuid(), valueAtRisk: 0 };
+    this.state = obj.state;
+  }
+
+  async updateVar() {
+    this.state.valueAtRisk = await computeVar(
+      this.params.zscore,
+      this.state.positions,
+      this.params.nbComputePeriods,
+      this.params.timeframe,
+    );
   }
 
   async addPosition(
@@ -68,28 +79,27 @@ export class Portfolio {
     if (!isAcceptedOpportunityStatus)
       return addPositionRejectedUpperMaxVarStatus;
 
-    const acceptedPosition: position = { ...positionOpportunity, uuid: uuid() };
+    // const acceptedPosition: position = { ...positionOpportunity, id: id() };
 
-    this.state.positions.push(acceptedPosition);
+    // this.state.positions.push(acceptedPosition);
 
     this.state.valueAtRisk = proposedVar;
 
     return {
       status: 'accepted',
-      uuid: acceptedPosition.uuid,
     };
   }
 
-  async removePosition(uuid: string): Promise<void> {
-    this.state.positions = this.state.positions.filter(
-      (position) => position.uuid !== uuid,
-    );
+  // async removePosition(id: string): Promise<void> {
+  //   this.state.positions = this.state.positions.filter(
+  //     (position) => position.id !== id,
+  //   );
 
-    this.state.valueAtRisk = await computeVar(
-      this.params.zscore,
-      this.state.positions,
-      this.params.nbComputePeriods,
-      this.params.timeframe,
-    );
-  }
+  //   this.state.valueAtRisk = await computeVar(
+  //     this.params.zscore,
+  //     this.state.positions,
+  //     this.params.nbComputePeriods,
+  //     this.params.timeframe,
+  //   );
+  // }
 }

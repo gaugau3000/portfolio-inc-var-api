@@ -1,14 +1,7 @@
 import { IsDefined, IsInt, IsNumber, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { portfolioConstraints } from '../interfaces/interfaces';
 
 export class CreatePortfolioConstraints {
-  constructor(params: portfolioConstraints) {
-    this.maxOpenTradeSameSymbolSameDirection =
-      params.maxOpenTradeSameSymbolSameDirection;
-    this.maxVarInDollar = params.maxVarInDollar;
-  }
-
   @ApiProperty({
     description: 'The max value at risk in dollar for your portfolio',
     example: 1000,

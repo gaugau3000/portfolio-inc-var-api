@@ -4,6 +4,7 @@ import { PortfolioService } from './portfolios/portfolio.service';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { AppConfig } from './portfolios/models/app-config';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { AppConfig } from './portfolios/models/app-config';
     }),
   ],
   controllers: [PortfolioController],
-  providers: [PortfolioService, AppConfig],
+  providers: [PortfolioService, AppConfig, PrismaService],
 })
 export class AppModule {}

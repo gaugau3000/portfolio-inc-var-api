@@ -16,20 +16,22 @@ export async function computeVar(
   nbComputePeriods: number,
   timeframe: string,
 ): Promise<number> {
-  const positionsLastCloses: number[][] = [];
+  let positionsLastCloses: number[][] = [];
 
-  await Promise.all(
-    positions.map(async (position) => {
-      positionsLastCloses.push(
-        await getAssetLastCloses(
-          position.pair,
-          nbComputePeriods,
-          timeframe,
-          position.dataSource,
-        ),
-      );
-    }),
-  );
+  const assetLastClosesPromises = [];
+
+  positions.forEach((position) => {
+    assetLastClosesPromises.push(
+      getAssetLastCloses(
+        position.pair,
+        nbComputePeriods,
+        timeframe,
+        position.dataSource,
+      ),
+    );
+  });
+
+  positionsLastCloses = await Promise.all(assetLastClosesPromises);
 
   const positionsStd = [];
   positionsLastCloses.forEach((positionLastCloses) => {
@@ -38,13 +40,15 @@ export async function computeVar(
 
   const weights: number[] = computeWeights(positions);
 
+  const positionsMatrix: number[][] = getPositionsCorrMatrix(
+    positionsLastCloses,
+    positions.map((position) => position.direction),
+  );
+
   const portfolioStd: number = getPortfolioStd(
     weights,
     positionsStd,
-    getPositionsCorrMatrix(
-      positionsLastCloses,
-      positions.map((position) => position.direction),
-    ),
+    positionsMatrix,
   );
 
   const totalInvestedAmount: number = sumInvestedAmount(positions);
@@ -108,14 +112,16 @@ export function getPortfolioStd(
     positionsWeights,
     positionsStd,
   );
+
   const weightsStdCorrMember = computeWeightsStdCorrMember(
     positionsWeights,
     positionsStd,
     positionsCorrMatrix,
   );
+
   portfolioStdSquare = weightsStdMember + weightsStdCorrMember;
 
-  return Math.sqrt(portfolioStdSquare);
+  return Math.sqrt(Math.abs(portfolioStdSquare));
 }
 
 function computeWeightsStdCorrMember(

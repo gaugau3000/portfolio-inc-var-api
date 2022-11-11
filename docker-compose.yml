@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  portfolio-inc-var-api:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://portfolio:portfolio@db:5432/portfolio?schema=public
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "db"
+
+  db:
+    image: postgres
+    volumes:
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    environment:
+      POSTGRES_PASSWORD: postgres

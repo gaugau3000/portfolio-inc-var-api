@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Portfolio {
+  id                                  Int        @id @default(autoincrement())
+  maxVarInDollar                      Float
+  maxOpenTradeSameSymbolSameDirection Int
+  nbComputePeriods                    Int
+  zscore                              Float
+  timeframe                           String
+  nameId                              String     @unique
+  positions                           Position[]
+}
+
+model Position {
+  id           Int        @id @default(autoincrement())
+  pair         String
+  dollarAmount Float
+  direction    String
+  dataSource   String
+  portfolioId  Int
+  strategy     String?
+  Portfolio    Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+}

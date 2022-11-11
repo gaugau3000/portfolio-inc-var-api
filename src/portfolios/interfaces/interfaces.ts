@@ -1,14 +1,20 @@
 export type direction = 'long' | 'short';
 
-export interface position extends positionOpportunity {
-  uuid: string;
+export enum SupportedExchanges {
+  BinanceFutures = 'binance_futures',
+  BinanceSpot = 'binance_spot',
 }
 
 export interface positionOpportunity {
   pair: string;
   dollarAmount: number;
   direction: direction;
-  dataSource: dataSource;
+  dataSource: SupportedExchanges;
+  strategy?: string;
+}
+
+export interface position extends positionOpportunity {
+  id: number;
 }
 
 export type positions = Array<position>;
@@ -30,11 +36,9 @@ export type timeframe =
 
 export interface addPositionResponse {
   status: 'accepted' | 'rejected';
-  uuid?: string;
+  id?: number;
   reason?: string;
 }
-
-export type dataSource = 'binance_future';
 
 export type opportunityInfo = {
   opportunity: {
@@ -56,7 +60,7 @@ export interface portfolioParams {
 }
 
 export interface portfolioState {
-  uuid: string;
+  id: null | number;
   positions: Array<position>;
   valueAtRisk: number;
 }
