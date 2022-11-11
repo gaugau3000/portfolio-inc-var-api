@@ -71,7 +71,8 @@
     "coverageReporters": [
       "json-summary",
       "text",
-      "lcov"
+      "lcov",
+      "cobertura"
     ],
     "moduleFileExtensions": [
       "js",
