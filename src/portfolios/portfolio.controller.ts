@@ -21,7 +21,7 @@ import { Position } from '@prisma/client';
 
 @Controller('portfolios')
 export class PortfolioController {
-  constructor(private readonly portfolioService: PortfolioService) {}
+  constructor(private readonly portfolioService: PortfolioService) { }
 
   @Post()
   async create(
@@ -44,7 +44,7 @@ export class PortfolioController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updatePortfolioDto: UpdatePortfolioDto,
   ) {
@@ -52,7 +52,7 @@ export class PortfolioController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  async delete(@Param('id') id: string) {
     return this.portfolioService.delete(parseInt(id));
   }
 

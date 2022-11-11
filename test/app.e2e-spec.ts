@@ -8,33 +8,6 @@ import { UpdatePortfolioDto } from '../src/portfolios/dto/update-portfolio.dto';
 import { PrismaService } from '../src/prisma.service';
 import { SupportedExchanges } from '../src/portfolios/interfaces/interfaces';
 
-// jest.mock('../src/portfolios/pure_functions/candles', () => {
-//   return {
-//     getAssetLastCloses: jest
-//       .fn()
-//       .mockResolvedValueOnce([
-//         29482.5, 29313.5, 29065, 29091.4, 28827.2, 28930.1, 28812.6, 29335.4,
-//         29600, 29517.8, 29325.8, 29366.7, 29690, 30223.3, 30079.8, 29949.7,
-//         29925.8, 29841.1, 29715.9, 29607.5,
-//       ])
-//       .mockResolvedValueOnce([
-//         2028, 2012.91, 1984.35, 1984.14, 1961.98, 1972.51, 1962.65, 2007.42,
-//         2016.85, 2013, 1995.17, 1997.68, 2027, 2055.19, 2055, 2051.99, 2039.48,
-//         2031.72, 2013.15, 2014.16,
-//       ])
-//       .mockResolvedValueOnce([
-//         29482.5, 29313.5, 29065, 29091.4, 28827.2, 28930.1, 28812.6, 29335.4,
-//         29600, 29517.8, 29325.8, 29366.7, 29690, 30223.3, 30079.8, 29949.7,
-//         29925.8, 29841.1, 29715.9, 29607.5,
-//       ])
-//       .mockResolvedValueOnce([
-//         2028, 2012.91, 1984.35, 1984.14, 1961.98, 1972.51, 1962.65, 2007.42,
-//         2016.85, 2013, 1995.17, 1997.68, 2027, 2055.19, 2055, 2051.99, 2039.48,
-//         2031.72, 2013.15, 2014.16,
-//       ]),
-//   };
-// });
-
 jest.setTimeout(20000);
 
 let app: INestApplication;
@@ -199,7 +172,8 @@ describe('Test e2e portfolio', () => {
       await initApp();
     });
 
-    describe('Create a portfolio with max var of 100000, max open trade of 1 on 1 min tf and add an accepted position when i had position upper var allowed then', () => {
+    describe('Create a portfolio with max var of 100000, max open trade of 1 on 1 min tf and add an accepted position \
+              when i had position upper var allowed then', () => {
       let portfolioId = '';
 
       const createPortfolioDto: CreatePortfolioDto = {
