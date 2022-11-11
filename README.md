@@ -1,6 +1,8 @@
 
 # Rest Api risk management trading tool based on incremental value at risk
 
+[![codecov](https://codecov.io/gh/gaugau3000/portfolio-inc-var-api/branch/master/graph/badge.svg?token=HEYV9B8Z0B)](https://codecov.io/gh/gaugau3000/portfolio-inc-var-api)
+
 ## Description
 
 Following the  inspiration of the darwinex youtube playlist [Institutional-Grade Risk Management Techniques for Traders](https://www.youtube.com/watch?v=BxkkhzfD4Ug&list=PLv-cA-4O3y979Ltr9wQ2lRJu1INve3RCM&ab_channel=Darwinex) this api will allow you to manage the risk of your trading system based on incremental value at risk based on variance-covariance method (it take into account the volatility and the correlation between assets).
