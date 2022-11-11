@@ -51,7 +51,10 @@ export class PortfolioService {
     }
   }
 
-  async update(portfolioId: number, updatePortfolioDto: UpdatePortfolioDto) {
+  async update(
+    portfolioId: number,
+    updatePortfolioDto: UpdatePortfolioDto,
+  ): Promise<Portfolio> {
     let updateData = {};
 
     if (updatePortfolioDto.maxVarInDollar)
@@ -63,10 +66,17 @@ export class PortfolioService {
           updatePortfolioDto.maxOpenTradeSameSymbolSameDirection,
       };
 
-    return await this.prisma.portfolio.update({
+    const updatedPortfolio: PrismaPortfolio & {
+      positions: PrismaPosition[];
+    } = await this.prisma.portfolio.update({
       data: updateData,
       where: { id: portfolioId },
+      include: {
+        positions: true,
+      },
     });
+
+    return await prismaPortfolioToPortfolio(updatedPortfolio);
   }
 
   async findAll(): Promise<Portfolio[]> {
@@ -97,7 +107,7 @@ export class PortfolioService {
       },
     });
 
-    return prismaPortfolioToPortfolio(findPrismaPortfolio);
+    return await prismaPortfolioToPortfolio(findPrismaPortfolio);
   }
 
   async delete(id: number) {
