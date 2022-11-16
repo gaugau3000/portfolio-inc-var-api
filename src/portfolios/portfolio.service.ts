@@ -83,7 +83,11 @@ export class PortfolioService {
       positions: PrismaPosition[];
     })[] = await this.prisma.portfolio.findMany({
       include: {
-        positions: true,
+        positions: {
+          orderBy: {
+            strategy: 'asc',
+          },
+        },
       },
     });
 
